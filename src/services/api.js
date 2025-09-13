@@ -8,14 +8,17 @@ const getApiBaseUrl = () => {
   return import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
 };
 
-const API_BASE_URL = getApiBaseUrl();
-
-// Create axios instance
+// Create axios instance without baseURL - we'll set it dynamically
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Add request interceptor to set dynamic base URL
+apiClient.interceptors.request.use((config) => {
+  config.baseURL = getApiBaseUrl();
+  return config;
 });
 
 // Add response interceptor for automatic token refresh
@@ -25,7 +28,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken });
+        const response = await axios.post(`${getApiBaseUrl()}/auth/refresh`, { refreshToken });
         const { accessToken, refreshToken: newRefreshToken } = response.data;
         
         // Update stored tokens
