@@ -1,39 +1,14 @@
 import axios from 'axios';
 
-// Get API URL from runtime config (can be changed after build) or fallback to build-time env var
-const getApiBaseUrl = () => {
-  // Check runtime config first
-  if (typeof window !== 'undefined' && window.APP_CONFIG?.API_BASE_URL) {
-    return window.APP_CONFIG.API_BASE_URL;
-  }
-  // Then check build-time environment variable
-  if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL;
-  }
-  // Final fallback
-  return 'https://cargo360-api.onrender.com/';
-};
+// Hardcoded API base URL - change this manually for development/production
+const API_BASE_URL = 'https://cargo360-api.onrender.com/';
 
-// Create axios instance with explicit baseURL to prevent axios defaults
+// Create axios instance
 const apiClient = axios.create({
-  baseURL: getApiBaseUrl(), // Set initial baseURL
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-});
-
-// Add request interceptor to ensure correct base URL on every request
-apiClient.interceptors.request.use((config) => {
-  const baseURL = getApiBaseUrl();
-  config.baseURL = baseURL;
-  
-  // Ensure the URL is absolute if it's a relative path
-  if (config.url && !config.url.startsWith('http')) {
-    config.url = baseURL.replace(/\/$/, '') + (config.url.startsWith('/') ? config.url : '/' + config.url);
-  }
-  
-  console.log('API Request URL:', config.baseURL + config.url);
-  return config;
 });
 
 // Add response interceptor for automatic token refresh
@@ -43,7 +18,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const response = await axios.post(`${getApiBaseUrl()}/auth/refresh`, { refreshToken });
+        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken });
         const { accessToken, refreshToken: newRefreshToken } = response.data;
         
         // Update stored tokens
