@@ -2,22 +2,37 @@ import axios from 'axios';
 
 // Get API URL from runtime config (can be changed after build) or fallback to build-time env var
 const getApiBaseUrl = () => {
+  // Check runtime config first
   if (typeof window !== 'undefined' && window.APP_CONFIG?.API_BASE_URL) {
     return window.APP_CONFIG.API_BASE_URL;
   }
-  return import.meta.env.VITE_API_BASE_URL || 'https://cargo360-api.onrender.com/';
+  // Then check build-time environment variable
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  // Final fallback
+  return 'https://cargo360-api.onrender.com/';
 };
 
-// Create axios instance without baseURL - we'll set it dynamically
+// Create axios instance with explicit baseURL to prevent axios defaults
 const apiClient = axios.create({
+  baseURL: getApiBaseUrl(), // Set initial baseURL
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add request interceptor to set dynamic base URL
+// Add request interceptor to ensure correct base URL on every request
 apiClient.interceptors.request.use((config) => {
-  config.baseURL = getApiBaseUrl();
+  const baseURL = getApiBaseUrl();
+  config.baseURL = baseURL;
+  
+  // Ensure the URL is absolute if it's a relative path
+  if (config.url && !config.url.startsWith('http')) {
+    config.url = baseURL.replace(/\/$/, '') + (config.url.startsWith('/') ? config.url : '/' + config.url);
+  }
+  
+  console.log('API Request URL:', config.baseURL + config.url);
   return config;
 });
 
