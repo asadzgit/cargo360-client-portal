@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaWeight, FaClock, FaPhone, FaUser, FaRoute, FaDollarSign, FaClipboardCheck, FaTimes } from 'react-icons/fa';
+import { FaArrowLeft, FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaWeight, FaClock, FaPhone, FaUser, FaRoute, FaDollarSign, FaClipboardCheck, FaTimes, FaCar } from 'react-icons/fa';
 import { useBooking } from '../context/BookingContext';
+import LocationTrackingModal from '../components/LocationTrackingModal';
 import './BookingDetailScreen.css';
 
 function BookingDetailScreen() {
@@ -9,6 +10,7 @@ function BookingDetailScreen() {
   const navigate = useNavigate();
   const { fetchBooking, cancelBooking, loading, error } = useBooking();
   const [booking, setBooking] = useState(null);
+  const [showLocationModal, setShowLocationModal] = useState(false);
 
   useEffect(() => {
     const loadBooking = async () => {
@@ -335,9 +337,18 @@ function BookingDetailScreen() {
             </button>
           )}
           
-          {booking.Trucker && ['accepted', 'picked_up', 'in_transit'].includes(booking.status.toLowerCase()) && (
+          {/* {booking.Trucker && ['accepted', 'picked_up', 'in_transit'].includes(booking.status.toLowerCase()) && (
             <button className="btn btn-accent">
               <FaPhone /> Call Trucker
+            </button>
+          )} */}
+
+          {['picked_up', 'in_transit'].includes(booking.status.toLowerCase()) && (
+            <button 
+              className="btn btn-primary"
+              onClick={() => setShowLocationModal(true)}
+            >
+              <FaCar /> See Driver Location
             </button>
           )}
           
@@ -348,6 +359,13 @@ function BookingDetailScreen() {
             <FaTruck /> Book Another Vehicle
           </button>
         </div>
+
+        {/* Location Tracking Modal */}
+        <LocationTrackingModal 
+          booking={booking}
+          isOpen={showLocationModal}
+          onClose={() => setShowLocationModal(false)}
+        />
       </div>
     </div>
   );

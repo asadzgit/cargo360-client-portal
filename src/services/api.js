@@ -189,6 +189,14 @@ export const bookingAPI = {
       headers: getAuthHeaders(),
     });
   },
+
+  // Get current location of driver for a shipment
+  getCurrentLocation: async (id) => {
+    return apiRequest(`/location/shipments/${id}/current`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+  },
 };
 
 // Token management utilities
