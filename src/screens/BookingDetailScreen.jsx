@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaWeight, FaClock, FaPhone, FaUser, FaRoute, FaMoneyBill, FaClipboardCheck, FaTimes, FaCar } from 'react-icons/fa';
+import { FaArrowLeft, FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaWeight, FaClock, FaPhone, FaUser, FaRoute, FaMoneyBill, FaClipboardCheck, FaTimes, FaCar, FaEdit } from 'react-icons/fa';
 import { useBooking } from '../context/BookingContext';
 import LocationTrackingModal from '../components/LocationTrackingModal';
+import EditBookingModal from '../components/EditBookingModal';
 import './BookingDetailScreen.css';
 
 function BookingDetailScreen() {
@@ -11,6 +12,7 @@ function BookingDetailScreen() {
   const { fetchBooking, cancelBooking, loading, error } = useBooking();
   const [booking, setBooking] = useState(null);
   const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     const loadBooking = async () => {
@@ -24,6 +26,16 @@ function BookingDetailScreen() {
 
     loadBooking();
   }, [id]);
+
+  const handleEditSuccess = async () => {
+    // Refresh booking data after successful edit
+    try {
+      const bookingData = await fetchBooking(id);
+      setBooking(bookingData);
+    } catch (error) {
+      console.error('Failed to reload booking:', error);
+    }
+  };
 
   const handleCancelBooking = async () => {
     if (window.confirm('Are you sure you want to cancel this booking?')) {
@@ -311,7 +323,7 @@ function BookingDetailScreen() {
                   {booking.budget && (
                     <div className="price-item total">
                       <label>Budget</label>
-                      <value>${booking.budget}</value>
+                      <value>PKR {booking.budget}</value>
                     </div>
                   )}
                   {!booking.budget && (
@@ -329,12 +341,20 @@ function BookingDetailScreen() {
         {/* Action Buttons */}
         <div className="detail-actions">
           {booking.status.toLowerCase() === 'pending' && (
-            <button 
-              className="btn btn-secondary"
-              onClick={handleCancelBooking}
-            >
-              <FaTimes /> Cancel Booking
-            </button>
+            <>
+              <button 
+                className="btn btn-accent"
+                onClick={() => setShowEditModal(true)}
+              >
+                <FaEdit /> Edit Booking
+              </button>
+              <button 
+                className="btn btn-secondary"
+                onClick={handleCancelBooking}
+              >
+                <FaTimes /> Cancel Booking
+              </button>
+            </>
           )}
           
           {/* {booking.Trucker && ['accepted', 'picked_up', 'in_transit'].includes(booking.status.toLowerCase()) && (
@@ -365,6 +385,14 @@ function BookingDetailScreen() {
           booking={booking}
           isOpen={showLocationModal}
           onClose={() => setShowLocationModal(false)}
+        />
+
+        {/* Edit Booking Modal */}
+        <EditBookingModal 
+          booking={booking}
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={handleEditSuccess}
         />
       </div>
     </div>

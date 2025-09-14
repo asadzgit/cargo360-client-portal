@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaTruck, FaMapMarkerAlt, FaCheckCircle, FaCalendarAlt, FaWeight, FaDollarSign, FaUser, FaClipboardList } from 'react-icons/fa';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { FaTimes, FaTruck, FaMapMarkerAlt, FaWeight, FaClipboardList, FaCheckCircle } from 'react-icons/fa';
 import { useBooking } from '../context/BookingContext';
-import LocationSelect from '../components/LocationSelect';
-import './BookTruckScreen.css';
+import LocationSelect from './LocationSelect';
+import './EditBookingModal.css';
 
-function BookTruckScreen() {
-  const navigate = useNavigate();
-  const { createBooking, loading: bookingLoading, error: bookingError } = useBooking();
+function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
+  const { updateBooking, loading } = useBooking();
   const [formData, setFormData] = useState({
     vehicleType: '',
     cargoType: '',
@@ -21,10 +18,9 @@ function BookTruckScreen() {
     customVehicleType: ''
   });
   const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Vehicle types according to API contract
+  // Vehicle types (same as BookTruckScreen)
   const vehicleTypes = [
     { id: 'shahzor_9ft_open', name: 'Shahzor-9Ft Open', capacity: 'Up to 1.5 tons' },
     { id: 'mazda_12_14ft', name: 'Mazda- 12/14 Ft', capacity: 'Up to 3 tons' },
@@ -67,6 +63,30 @@ function BookTruckScreen() {
     { id: 'container_20ft_reefer', name: '20Ft Reefer Container', capacity: 'Up to 20 tons' },
     { id: 'other', name: 'Other (Please Specify)', capacity: 'Custom' }
   ];
+
+  // Populate form with booking data when modal opens
+  useEffect(() => {
+    if (isOpen && booking) {
+      // Check if vehicleType is a custom one (not in predefined list)
+      const isCustomVehicle = !vehicleTypes.find(v => v.id === booking.vehicleType);
+      
+      setFormData({
+        vehicleType: isCustomVehicle ? 'other' : booking.vehicleType,
+        cargoType: booking.cargoType || '',
+        pickupLocation: booking.pickupLocation || '',
+        dropLocation: booking.dropLocation || '',
+        cargoWeight: booking.cargoWeight || '',
+        cargoSize: booking.cargoSize || '',
+        description: booking.description || '',
+        budget: booking.budget || '',
+        customVehicleType: isCustomVehicle ? booking.vehicleType : ''
+      });
+      setErrors({});
+      setShowSuccess(false);
+    }
+  }, [isOpen, booking]);
+
+  const selectedVehicle = vehicleTypes.find(v => v.id === formData.vehicleType);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -128,23 +148,7 @@ function BookTruckScreen() {
     }
     
     if (formData.dropLocation && formData.dropLocation.length < 5) {
-      newErrors.dropLocation = 'Drop location must be at least 5 characters';
-    }
-    
-    if (formData.cargoType && formData.cargoType.length < 2) {
-      newErrors.cargoType = 'Cargo type must be at least 2 characters';
-    }
-    
-    if (formData.description && formData.description.length < 10) {
-      newErrors.description = 'Description must be at least 10 characters';
-    }
-    
-    if (formData.cargoWeight && isNaN(parseFloat(formData.cargoWeight))) {
-      newErrors.cargoWeight = 'Please enter a valid weight';
-    }
-    
-    if (formData.budget && isNaN(parseFloat(formData.budget))) {
-      newErrors.budget = 'Please enter a valid budget amount';
+      newErrors.dropLocation = 'Delivery location must be at least 5 characters';
     }
     
     return newErrors;
@@ -159,11 +163,8 @@ function BookTruckScreen() {
       return;
     }
     
-    setLoading(true);
-    setErrors({});
-    
     try {
-      const bookingData = {
+      const updateData = {
         vehicleType: formData.vehicleType === 'other' ? formData.customVehicleType : formData.vehicleType,
         pickupLocation: formData.pickupLocation,
         dropLocation: formData.dropLocation,
@@ -174,71 +175,45 @@ function BookTruckScreen() {
         budget: formData.budget ? parseFloat(formData.budget) : undefined
       };
 
-      const response = await createBooking(bookingData);
+      await updateBooking(booking.id, updateData);
       setShowSuccess(true);
       
-      // Reset form after delay and navigate
+      // Close modal and refresh data after delay
       setTimeout(() => {
-        navigate('/client-home');
-      }, 3000);
+        onSuccess();
+        onClose();
+      }, 2000);
       
     } catch (error) {
-      setErrors({ submit: error.message || 'Failed to submit booking. Please try again.' });
-    } finally {
-      setLoading(false);
+      setErrors({ submit: error.message });
     }
   };
 
-  const selectedVehicle = vehicleTypes.find(v => v.id === formData.vehicleType);
-
-  if (showSuccess) {
-    return (
-      <div className="book-truck-screen">
-        <div className="container">
-          <div className="success-container fade-in">
-            <div className="success-icon">
-              <FaCheckCircle />
-            </div>
-            <h2>Booking Submitted Successfully!</h2>
-            <p>
-              Your truck booking request has been submitted and is now pending approval. 
-              We'll notify you once a driver accepts your request.
-            </p>
-            <div className="success-details">
-              <p><strong>Booking ID:</strong> Will be provided via email</p>
-              <p><strong>Vehicle:</strong> {selectedVehicle?.name}</p>
-              <p><strong>Route:</strong> {formData.pickupLocation} → {formData.dropLocation}</p>
-              <p><strong>Cargo Type:</strong> {formData.cargoType}</p>
-            </div>
-            <button 
-              className="btn btn-primary btn-large"
-              onClick={() => navigate('/client-home')}
-            >
-              Back to Home
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (!isOpen) return null;
 
   return (
-    <div className="book-truck-screen">
-      <div className="container">
-        <div className="screen-header">
-          <h1><FaTruck /> Book a Vehicle</h1>
-          <p>Fill out the details below to request a vehicle for your cargo transportation needs</p>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content edit-booking-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3>
+            <FaTruck /> Edit Booking #{booking?.id}
+          </h3>
+          <button className="close-btn" onClick={onClose}>
+            <FaTimes />
+          </button>
         </div>
 
-        <div className="booking-form-container">
-          <form onSubmit={handleSubmit} className="booking-form">
-            {errors.submit && (
-              <div className="error-message">{errors.submit}</div>
-            )}
-
+        {showSuccess ? (
+          <div className="success-message">
+            <FaCheckCircle className="success-icon" />
+            <h4>Booking Updated Successfully!</h4>
+            <p>Your booking has been updated. Closing modal...</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="edit-booking-form">
             {/* Vehicle Type Selection */}
             <div className="form-section">
-              <h3>Vehicle Information</h3>
+              <h4><FaTruck /> Vehicle Information</h4>
               <div className="form-group">
                 <label className="form-label">Vehicle Type *</label>
                 <select
@@ -257,7 +232,7 @@ function BookTruckScreen() {
                 {errors.vehicleType && <div className="form-error">{errors.vehicleType}</div>}
               </div>
 
-              {/* Custom Vehicle Type Input - Show when "Other" is selected */}
+              {/* Custom Vehicle Type Input */}
               {formData.vehicleType === 'other' && (
                 <div className="form-group">
                   <label className="form-label">Please Specify Vehicle Type *</label>
@@ -275,15 +250,39 @@ function BookTruckScreen() {
 
               {selectedVehicle && formData.vehicleType !== 'other' && (
                 <div className="vehicle-details">
-                  <h4>{selectedVehicle.name}</h4>
+                  <h5>{selectedVehicle.name}</h5>
                   <p><strong>Capacity:</strong> {selectedVehicle.capacity}</p>
                 </div>
               )}
             </div>
 
+            {/* Location Information */}
+            <div className="form-section">
+              <h4><FaMapMarkerAlt /> Location Details</h4>
+              <div className="location-fields">
+                <LocationSelect
+                  label="Pickup Location *"
+                  name="pickupLocation"
+                  value={formData.pickupLocation}
+                  onChange={handleLocationChange}
+                  placeholder="Search for pickup location..."
+                  error={errors.pickupLocation}
+                />
+
+                <LocationSelect
+                  label="Delivery Location *"
+                  name="dropLocation"
+                  value={formData.dropLocation}
+                  onChange={handleLocationChange}
+                  placeholder="Search for delivery location..."
+                  error={errors.dropLocation}
+                />
+              </div>
+            </div>
+
             {/* Cargo Information */}
             <div className="form-section">
-              <h3>Cargo Information</h3>
+              <h4><FaClipboardList /> Cargo Information</h4>
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">Cargo Type *</label>
@@ -314,7 +313,7 @@ function BookTruckScreen() {
               </div>
 
               <div className="form-row">
-                {/* <div className="form-group">
+                <div className="form-group">
                   <label className="form-label">Cargo Size</label>
                   <input
                     type="text"
@@ -322,25 +321,24 @@ function BookTruckScreen() {
                     className={`form-input ${errors.cargoSize ? 'error' : ''}`}
                     value={formData.cargoSize}
                     onChange={handleChange}
-                    placeholder="e.g., Large, Medium, Small"
+                    placeholder="e.g., Large box, Small package"
                   />
                   {errors.cargoSize && <div className="form-error">{errors.cargoSize}</div>}
-                </div> */}
+                </div>
 
-                {/* <div className="form-group">
-                  <label className="form-label">Budget ($)</label>
+                <div className="form-group">
+                  <label className="form-label">Budget (PKR)</label>
                   <input
                     type="number"
                     name="budget"
                     className={`form-input ${errors.budget ? 'error' : ''}`}
                     value={formData.budget}
                     onChange={handleChange}
-                    placeholder="e.g., 1200"
+                    placeholder="e.g., 5000"
                     min="0"
-                    step="0.01"
                   />
                   {errors.budget && <div className="form-error">{errors.budget}</div>}
-                </div> */}
+                </div>
               </div>
 
               <div className="form-group">
@@ -357,94 +355,21 @@ function BookTruckScreen() {
               </div>
             </div>
 
-            {/* Location Information */}
-            <div className="form-section">
-              <h3><FaMapMarkerAlt /> Location Details</h3>
-              <div className="location-fields">
-                <LocationSelect
-                  label="Pickup Location *"
-                  name="pickupLocation"
-                  value={formData.pickupLocation}
-                  onChange={handleLocationChange}
-                  placeholder="Search for pickup location..."
-                  error={errors.pickupLocation}
-                />
+            {errors.submit && <div className="form-error">{errors.submit}</div>}
 
-                <LocationSelect
-                  label="Delivery Location *"
-                  name="dropLocation"
-                  value={formData.dropLocation}
-                  onChange={handleLocationChange}
-                  placeholder="Search for delivery location..."
-                  error={errors.dropLocation}
-                />
-              </div>
-            </div>
-
-            {/* Date Information */}
-            {/* <div className="form-section">
-              <h3><FaCalendarAlt /> Schedule</h3>
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Pickup Date *</label>
-                  <input
-                    type="date"
-                    name="pickupDate"
-                    className={`form-input ${errors.pickupDate ? 'error' : ''}`}
-                    value={formData.pickupDate}
-                    onChange={handleChange}
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                  {errors.pickupDate && <div className="form-error">{errors.pickupDate}</div>}
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Delivery Date *</label>
-                  <input
-                    type="date"
-                    name="deliveryDate"
-                    className={`form-input ${errors.deliveryDate ? 'error' : ''}`}
-                    value={formData.deliveryDate}
-                    onChange={handleChange}
-                    min={formData.pickupDate || new Date().toISOString().split('T')[0]}
-                  />
-                  {errors.deliveryDate && <div className="form-error">{errors.deliveryDate}</div>}
-                </div>
-              </div>
-            </div> */}
-
-            {/* Submit Button */}
-            <div className="form-actions">
-              <button
-                type="button"
-                className="btn btn-secondary btn-large"
-                onClick={() => navigate('/client-home')}
-              >
+            <div className="modal-actions">
+              <button type="button" className="btn btn-secondary" onClick={onClose}>
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="btn btn-primary btn-large"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <div className="loading-spinner" />
-                    Submitting Request...
-                  </>
-                ) : (
-                  <>
-                    <FaTruck />
-                    Submit Booking Request
-                  </>
-                )}
+              <button type="submit" className="btn btn-primary" disabled={loading}>
+                {loading ? 'Updating...' : 'Update Booking'}
               </button>
             </div>
           </form>
-        </div>
+        )}
       </div>
     </div>
   );
 }
 
-export default BookTruckScreen;
+export default EditBookingModal;
