@@ -1,63 +1,19 @@
 import React from 'react';
 import { FaTruck, FaGlobe, FaFileAlt, FaPaperPlane, FaAddressBook, FaEnvelope } from 'react-icons/fa';
-import { FaBuilding, FaBoxes, FaPhone, FaMapMarkerAlt, FaClock, FaShieldAlt, FaDollarSign } from 'react-icons/fa';
+import { FaBuilding, FaBoxes, FaPhone, FaMapMarkerAlt, FaClock, FaShieldAlt, FaMoneyBill } from 'react-icons/fa';
 import {  FaUserTie, FaHome } from 'react-icons/fa';
 
 import logo from '../assets/cargo-360.png';
 import { Link } from 'react-router-dom';
+import Navbar from '../components/NavBar';
 function HomePage() {
   return (
-    <div className="booking-status-screen">
-      {/* Navigation */}
-     <nav
-  className="tab-navigation"
-  style={{
-    top: 0,
-    height: '12%',
-    borderBottom: '1px solid var(--border-color)',
-  }}
->
-  <div className="tab-container" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-    {/* Logo Section */}
-    <div className="logo-container">
-      <img src={logo} alt="logo" className='brand-logo' />
-    </div>
+<>
 
-    {/* Links Section */}
-    <div className="links-container" style={{ display: 'flex', gap: '20px' }}>
-      <a style={{ color: '#6b7280' }} href="/home">
-        <button className="tab-item">
-          <FaHome className="tab-icon" />
-          <span className="tab-label">Home</span>
-        </button>
-      </a>
-      <a style={{ color: '#6b7280' }} href="#about">
-        <button className="tab-item">
-          <FaBuilding className="tab-icon" />
-          <span className="tab-label">About</span>
-        </button>
-      </a>
-      <a style={{ color: '#6b7280' }} href="#services">
-        <button className="tab-item">
-          <FaBoxes className="tab-icon" />
-          <span className="tab-label">Services</span>
-        </button>
-      </a>
-      <a style={{ color: '#6b7280' }} href="#contact">
-        <button className="tab-item">
-          <FaAddressBook className="tab-icon" />
-          <span className="tab-label">Contact Us</span>
-        </button>
-      </a>
-      <a style={{ color: '#6b7280' }} href="/book-truck">
-        <button className="tab-item">
-          <FaUserTie className="tab-icon" />
-          <span className="tab-label">Client Login</span>
-        </button>
-      </a>
-    </div>
-  </div>
-</nav>
+   <Navbar/>
+<div className="booking-status-screen">
+      {/* Navigation */}
+
 
 
       {/* Hero Section */}
@@ -98,7 +54,7 @@ function HomePage() {
                     </div>
                     </div>
                     <div className="feature-item">
-                    <FaDollarSign className="feature-icon" />
+                    <FaMoneyBill className="feature-icon" />
                     <div>
                         <h4>Competitive Rates</h4>
                         <p>Get the best prices for your transportation needs</p>
@@ -132,14 +88,14 @@ function HomePage() {
                 <div className="service-icon">
                     <FaFileAlt />
                 </div>
-                <h3>Import Clearance</h3>
+                <h3>Import/Export Clearance</h3>
             <p>Hassle-free customs & documentation support.</p>
                 </div>
                 <div className="service-card card">
                 <div className="service-icon">
                     <FaPaperPlane />
                 </div>
-                <h3>Export Forwarding</h3>
+                <h3>Freight Forwarding</h3>
                 <p>Smooth handling of global export operations.</p>
                 </div>
             </div>
@@ -183,6 +139,7 @@ function HomePage() {
         <small>© {new Date().getFullYear()} CARGO 360. All rights reserved.</small>
       </footer>
     </div>
+    </> 
   );
 }
 

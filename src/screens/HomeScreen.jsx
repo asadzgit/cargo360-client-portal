@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaTruck, FaClipboardList, FaShippingFast, FaUsers, FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock, FaShieldAlt, FaDollarSign } from 'react-icons/fa';
+import { FaTruck, FaClipboardList, FaShippingFast, FaUsers, FaEnvelope, FaShieldAlt } from 'react-icons/fa';
+import { FaGlobe, FaFileAlt, FaPaperPlane, FaAddressBook } from 'react-icons/fa';
+import { FaBuilding, FaBoxes, FaPhone, FaMapMarkerAlt, FaClock, FaMoneyBill } from 'react-icons/fa';
+import {  FaUserTie, FaHome } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { useBooking } from '../context/BookingContext';
 import './HomeScreen.css';
@@ -167,7 +170,7 @@ function HomeScreen() {
                   </div>
                 </div>
                 <div className="feature-item">
-                  <FaDollarSign className="feature-icon" />
+                  <FaMoneyBill className="feature-icon" />
                   <div>
                     <h4>Competitive Rates</h4>
                     <p>Get the best prices for your transportation needs</p>
@@ -190,29 +193,29 @@ function HomeScreen() {
       <section className="services-section">
         <div className="container">
           <h2>Our Services</h2>
-          <div className="services-grid">
-            <div className="service-card card">
-              <div className="service-icon">
-                <FaTruck />
-              </div>
-              <h3>Local Delivery</h3>
-              <p>Same-day and next-day delivery services within the city</p>
-            </div>
-            <div className="service-card card">
-              <div className="service-icon">
-                <FaShippingFast />
-              </div>
-              <h3>Long Distance</h3>
-              <p>Interstate transportation with real-time tracking</p>
-            </div>
-            <div className="service-card card">
-              <div className="service-icon">
-                <FaUsers />
-              </div>
-              <h3>Corporate Solutions</h3>
-              <p>Customized fleet solutions for businesses</p>
-            </div>
-          </div>
+                  <div className="services-grid">
+                          <div className="service-card card">
+                          <div className="service-icon">
+                              <FaTruck />
+                          </div>
+                         <h3>Logistics Solutions</h3>
+                      <p>Reliable & efficient transportation services worldwide.</p>
+                          </div>
+                          <div className="service-card card">
+                          <div className="service-icon">
+                              <FaFileAlt />
+                          </div>
+                          <h3>Import/Export Clearance</h3>
+                      <p>Hassle-free customs & documentation support.</p>
+                          </div>
+                          <div className="service-card card">
+                          <div className="service-icon">
+                              <FaPaperPlane />
+                          </div>
+                          <h3>Freight Forwarding</h3>
+                          <p>Smooth handling of global export operations.</p>
+                          </div>
+                      </div>
         </div>
       </section>
 

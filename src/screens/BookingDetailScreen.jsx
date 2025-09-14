@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaWeight, FaClock, FaPhone, FaUser, FaRoute, FaDollarSign, FaClipboardCheck, FaTimes, FaCar } from 'react-icons/fa';
+import { FaArrowLeft, FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaWeight, FaClock, FaPhone, FaUser, FaRoute, FaMoneyBill, FaClipboardCheck, FaTimes, FaCar } from 'react-icons/fa';
 import { useBooking } from '../context/BookingContext';
 import LocationTrackingModal from '../components/LocationTrackingModal';
 import './BookingDetailScreen.css';
@@ -237,7 +237,7 @@ function BookingDetailScreen() {
             </div> */}
 
             {/* Trucker Information */}
-            {booking.Trucker && (
+            {/* {booking.Trucker && (
               <div className="detail-card">
                 <div className="card-header">
                   <h3><FaUser /> Trucker Information</h3>
@@ -268,7 +268,7 @@ function BookingDetailScreen() {
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
 
             {/* Booking Timeline */}
             <div className="detail-card">
@@ -304,7 +304,7 @@ function BookingDetailScreen() {
             {/* Pricing Information */}
             <div className="detail-card pricing-card">
               <div className="card-header">
-                <h3><FaDollarSign /> Pricing</h3>
+                <h3><FaMoneyBill /> Pricing</h3>
               </div>
               <div className="card-body">
                 <div className="pricing-breakdown">
@@ -317,7 +317,7 @@ function BookingDetailScreen() {
                   {!booking.budget && (
                     <div className="price-item">
                       <label>Pricing</label>
-                      <value>To be negotiated with trucker</value>
+                      <value>In Negotiation</value>
                     </div>
                   )}
                 </div>

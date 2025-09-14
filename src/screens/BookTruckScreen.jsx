@@ -87,7 +87,6 @@ function BookTruckScreen() {
     if (!formData.cargoType) newErrors.cargoType = 'Please enter cargo type';
     if (!formData.pickupLocation) newErrors.pickupLocation = 'Please enter pickup location';
     if (!formData.dropLocation) newErrors.dropLocation = 'Please enter delivery location';
-    if (!formData.description) newErrors.description = 'Please provide cargo description';
     
     if (formData.pickupLocation === formData.dropLocation) {
       newErrors.dropLocation = 'Delivery location must be different from pickup location';
@@ -298,7 +297,7 @@ function BookTruckScreen() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Cargo Description *</label>
+                <label className="form-label">Cargo Description</label>
                 <textarea
                   name="description"
                   className={`form-input ${errors.description ? 'error' : ''}`}
