@@ -18,7 +18,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken });
+        const response = await axios.post(`${API_BASE_URL}auth/refresh`, { refreshToken });
         const { accessToken, refreshToken: newRefreshToken } = response.data;
         
         // Update stored tokens
