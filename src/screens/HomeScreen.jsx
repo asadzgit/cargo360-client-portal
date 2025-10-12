@@ -44,6 +44,7 @@ function HomeScreen() {
               </button>
               <button 
                 className="btn btn-large"
+                style={{backgroundColor: '#ffffff', color: '#000000'}}
                 onClick={() => navigate('/bookings')}
               >
                 <FaClipboardList /> View Bookings

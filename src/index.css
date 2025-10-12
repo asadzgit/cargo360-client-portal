@@ -82,6 +82,12 @@ button:focus-visible {
   color: black;
 }
 
-input {
-  color: black; 
+input, select {
+  color: #000000;
+  background-color: #ffffff;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
 }
