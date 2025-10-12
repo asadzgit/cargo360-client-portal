@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaTruck, FaClipboardList, FaShippingFast, FaUsers, FaEnvelope, FaShieldAlt } from 'react-icons/fa';
+import { FaTruck, FaClipboardList, FaShippingFast, FaUsers, FaEnvelope, FaShieldAlt, FaArrowRight } from 'react-icons/fa';
 import { FaGlobe, FaFileAlt, FaPaperPlane, FaAddressBook } from 'react-icons/fa';
 import { FaBuilding, FaBoxes, FaPhone, FaMapMarkerAlt, FaClock, FaMoneyBill } from 'react-icons/fa';
 import {  FaUserTie, FaHome } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { useBooking } from '../context/BookingContext';
+import {ClientFooter} from '../components/ClientFooter';
+import { humanize } from '../utils/helpers';
 import './HomeScreen.css';
 
 function HomeScreen() {
@@ -55,7 +57,8 @@ function HomeScreen() {
       <section className="stats-section">
         <div className="container">
           <div className="stats-grid">
-            <div className="stat-card">
+            <div className="stat-card"  style={{cursor: 'pointer' }}
+                  onClick={() => navigate('/bookings?status=pending')}>
               <div className="stat-icon pending">
                 <FaClock />
               </div>
@@ -64,7 +67,8 @@ function HomeScreen() {
                 <p>Pending Bookings</p>
               </div>
             </div>
-            <div className="stat-card">
+            <div className="stat-card"  style={{cursor: 'pointer' }}
+                  onClick={() => navigate('/bookings?status=active')}>
               <div className="stat-icon accepted">
                 <FaShippingFast />
               </div>
@@ -73,13 +77,14 @@ function HomeScreen() {
                 <p>Active Shipments</p>
               </div>
             </div>
-            <div className="stat-card">
+            <div className="stat-card"  style={{cursor: 'pointer' }}
+                  onClick={() => navigate('/bookings?status=delivered')}>
               <div className="stat-icon completed">
                 <FaClipboardList />
               </div>
               <div className="stat-content">
                 <h3>{completedCount}</h3>
-                <p>Completed Jobs</p>
+                <p>Delivered</p>
               </div>
             </div>
           </div>
@@ -123,15 +128,17 @@ function HomeScreen() {
                     <div className="booking-header">
                       <h4>#{booking.id}</h4>
                       <span className={`status-badge status-${booking.status.toLowerCase()}`}>
-                        {booking.status}
+                        {humanize(booking.status)}
                       </span>
                     </div>
                   </div>
                   <div className="card-body">
                     <div className="booking-details">
-                      <p><strong>Vehicle:</strong> {booking.vehicleType}</p>
-                      <p><strong>Cargo:</strong> {booking.cargoType}</p>
-                      <p><strong>Route:</strong> {booking.pickupLocation} → {booking.dropLocation}</p>
+                      <p><strong>Vehicle:</strong> {humanize(booking.vehicleType)}</p>
+                      <p><strong>Cargo:</strong> {humanize(booking.cargoType)}</p>
+                      <p><strong>Route:</strong> {booking.pickupLocation.substring(0, 25).concat('...')} 
+                                                  <span style={{color: 'var(--success-color)'}}> <FaTruck/> <FaArrowRight/> </span>
+                                                  {booking.dropLocation.substring(0, 25).concat('...')}</p>
                       <p><strong>Created:</strong> {new Date(booking.createdAt).toLocaleDateString()}</p>
                     </div>
                   </div>
@@ -149,107 +156,7 @@ function HomeScreen() {
           </div>
         </div>
       </section>
-
-      {/* About Us Section */}
-      <section className="about-section">
-        <div className="container">
-          <div className="about-content">
-            <div className="about-text">
-              <h2>About Cargo360</h2>
-              <p>
-                We're the leading platform connecting businesses and individuals with reliable 
-                truck transportation services. Our network of professional drivers and modern 
-                fleet ensures your cargo reaches its destination safely and on time.
-              </p>
-              <div className="about-features">
-                <div className="feature-item">
-                  <FaShieldAlt className="feature-icon" />
-                  <div>
-                    <h4>Secure Transport</h4>
-                    <p>All our vehicles are insured and tracked in real-time</p>
-                  </div>
-                </div>
-                <div className="feature-item">
-                  <FaMoneyBill className="feature-icon" />
-                  <div>
-                    <h4>Competitive Rates</h4>
-                    <p>Get the best prices for your transportation needs</p>
-                  </div>
-                </div>
-                <div className="feature-item">
-                  <FaClock className="feature-icon" />
-                  <div>
-                    <h4>24/7 Support</h4>
-                    <p>Our customer service team is always here to help</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Services Section */}
-      <section className="services-section">
-        <div className="container">
-          <h2>Our Services</h2>
-                  <div className="services-grid">
-                          <div className="service-card card">
-                          <div className="service-icon">
-                              <FaTruck />
-                          </div>
-                         <h3>Logistics Solutions</h3>
-                      <p>Reliable & efficient transportation services worldwide.</p>
-                          </div>
-                          <div className="service-card card">
-                          <div className="service-icon">
-                              <FaFileAlt />
-                          </div>
-                          <h3>Import/Export Clearance</h3>
-                      <p>Hassle-free customs & documentation support.</p>
-                          </div>
-                          <div className="service-card card">
-                          <div className="service-icon">
-                              <FaPaperPlane />
-                          </div>
-                          <h3>Freight Forwarding</h3>
-                          <p>Smooth handling of global export operations.</p>
-                          </div>
-                      </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section className="contact-section">
-        <div className="container">
-          <h2>Contact Us</h2>
-          <div className="contact-grid">
-            <div className="contact-info">
-              <div className="contact-item">
-                <FaPhone className="contact-icon" />
-                <div>
-                  <h4>Phone</h4>
-                  <p>+92 333 7766609</p>
-                </div>
-              </div>
-              <div className="contact-item">
-                <FaEnvelope className="contact-icon" />
-                <div>
-                  <h4>Email</h4>
-                  <p>info@cargo360pk.com</p>
-                </div>
-              </div>
-              <div className="contact-item">
-                <FaMapMarkerAlt className="contact-icon" />
-                <div>
-                  <h4>Address</h4>
-                  <p>Plaza # 146, 5th Floor. Sector C commercial area<br />Bahria Town Lahore</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ClientFooter />
     </div>
   );
 }

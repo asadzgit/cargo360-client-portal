@@ -15,10 +15,6 @@ body {
   min-height: 100vh;
 }
 
-.main-content {
-  padding-bottom: 80px;
-}
-
 #root {
   width: 100%;
 }

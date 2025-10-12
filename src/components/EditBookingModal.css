@@ -1,5 +1,6 @@
 .edit-booking-modal {
-  max-width: 800px;
+  width: 90%;
+  border-radius: 12px;
   max-height: 70vh;
   background-color: white;
   overflow-y: auto;
@@ -7,6 +8,7 @@
 
 .edit-booking-form {
   display: flex;
+  padding: 0 1rem 1rem;
   flex-direction: column;
   gap: 24px;
 }

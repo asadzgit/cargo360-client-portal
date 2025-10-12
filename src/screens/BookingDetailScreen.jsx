@@ -4,6 +4,7 @@ import { FaArrowLeft, FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaWeight, FaClock,
 import { useBooking } from '../context/BookingContext';
 import LocationTrackingModal from '../components/LocationTrackingModal';
 import EditBookingModal from '../components/EditBookingModal';
+import { humanize } from '../utils/helpers';
 import './BookingDetailScreen.css';
 
 function BookingDetailScreen() {
@@ -132,7 +133,7 @@ function BookingDetailScreen() {
                 style={{ color: getStatusColor(booking.status) }}
               >
                 {getStatusIcon(booking.status)}
-                {booking.status}
+                {humanize(booking.status)}
               </span>
             </div>
           </div>
@@ -150,11 +151,11 @@ function BookingDetailScreen() {
                 <div className="info-grid">
                   <div className="info-item">
                     <label>Vehicle Type</label>
-                    <value>{booking.vehicleType}</value>
+                    <value>{humanize(booking.vehicleType)}</value>
                   </div>
                   <div className="info-item">
                     <label>Cargo Type</label>
-                    <value>{booking.cargoType}</value>
+                    <value>{humanize(booking.cargoType)}</value>
                   </div>
                   {booking.cargoWeight && (
                     <div className="info-item">
@@ -323,7 +324,7 @@ function BookingDetailScreen() {
                   {booking.budget && (
                     <div className="price-item total">
                       <label>Budget</label>
-                      <value>PKR {booking.budget}</value>
+                      <value>PKR {booking.budget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</value>
                     </div>
                   )}
                   {!booking.budget && (

@@ -4,6 +4,7 @@ import { FaTruck, FaMapMarkerAlt, FaCheckCircle, FaCalendarAlt, FaWeight, FaDoll
 import { useAuth } from '../context/AuthContext';
 import { useBooking } from '../context/BookingContext';
 import LocationSelect from '../components/LocationSelect';
+import {ClientFooter} from '../components/ClientFooter';
 import './BookTruckScreen.css';
 
 function BookTruckScreen() {
@@ -223,227 +224,230 @@ function BookTruckScreen() {
   }
 
   return (
-    <div className="book-truck-screen">
-      <div className="container">
-        <div className="screen-header">
-          <h1><FaTruck /> Book a Vehicle</h1>
-          <p>Fill out the details below to request a vehicle for your cargo transportation needs</p>
-        </div>
+    <>
+      <div className="book-truck-screen">
+        <div className="container">
+          <div className="screen-header">
+            <h1><FaTruck /> Book a Vehicle</h1>
+            <p>Fill out the details below to request a vehicle for your cargo transportation needs</p>
+          </div>
 
-        <div className="booking-form-container">
-          <form onSubmit={handleSubmit} className="booking-form">
-            {errors.submit && (
-              <div className="error-message">{errors.submit}</div>
-            )}
-
-            {/* Vehicle Type Selection */}
-            <div className="form-section">
-              <h3>Vehicle Information</h3>
-              <div className="form-group">
-                <label className="form-label">Vehicle Type *</label>
-                <select
-                  name="vehicleType"
-                  className={`form-select ${errors.vehicleType ? 'error' : ''}`}
-                  value={formData.vehicleType}
-                  onChange={handleChange}
-                >
-                  <option value="">Select vehicle type</option>
-                  {vehicleTypes.map((vehicle) => (
-                    <option key={vehicle.id} value={vehicle.id}>
-                      {vehicle.name} - {vehicle.capacity}
-                    </option>
-                  ))}
-                </select>
-                {errors.vehicleType && <div className="form-error">{errors.vehicleType}</div>}
-              </div>
-
-              {/* Custom Vehicle Type Input - Show when "Other" is selected */}
-              {formData.vehicleType === 'other' && (
-                <div className="form-group">
-                  <label className="form-label">Please Specify Vehicle Type *</label>
-                  <input
-                    type="text"
-                    name="customVehicleType"
-                    className={`form-input ${errors.customVehicleType ? 'error' : ''}`}
-                    value={formData.customVehicleType}
-                    onChange={handleChange}
-                    placeholder="Please specify other vehicle type"
-                  />
-                  {errors.customVehicleType && <div className="form-error">{errors.customVehicleType}</div>}
-                </div>
+          <div className="booking-form-container">
+            <form onSubmit={handleSubmit} className="booking-form">
+              {errors.submit && (
+                <div className="error-message">{errors.submit}</div>
               )}
 
-              {selectedVehicle && formData.vehicleType !== 'other' && (
-                <div className="vehicle-details">
-                  <h4>{selectedVehicle.name}</h4>
-                  <p><strong>Capacity:</strong> {selectedVehicle.capacity}</p>
-                </div>
-              )}
-            </div>
-
-            {/* Cargo Information */}
-            <div className="form-section">
-              <h3>Cargo Information</h3>
-              <div className="form-row">
+              {/* Vehicle Type Selection */}
+              <div className="form-section">
+                <h3>Vehicle Information</h3>
                 <div className="form-group">
-                  <label className="form-label">Cargo Type *</label>
-                  <input
-                    type="text"
-                    name="cargoType"
-                    className={`form-input ${errors.cargoType ? 'error' : ''}`}
-                    value={formData.cargoType}
+                  <label className="form-label">Vehicle Type *</label>
+                  <select
+                    name="vehicleType"
+                    className={`form-select ${errors.vehicleType ? 'error' : ''}`}
+                    value={formData.vehicleType}
                     onChange={handleChange}
-                    placeholder="e.g., Electronics, Furniture, Food Items"
-                  />
-                  {errors.cargoType && <div className="form-error">{errors.cargoType}</div>}
+                  >
+                    <option value="">Select vehicle type</option>
+                    {vehicleTypes.map((vehicle) => (
+                      <option key={vehicle.id} value={vehicle.id}>
+                        {vehicle.name} - {vehicle.capacity}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.vehicleType && <div className="form-error">{errors.vehicleType}</div>}
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Cargo Weight (kg)</label>
-                  <input
-                    type="number"
-                    name="cargoWeight"
-                    className={`form-input ${errors.cargoWeight ? 'error' : ''}`}
-                    value={formData.cargoWeight}
-                    onChange={handleChange}
-                    placeholder="e.g., 500"
-                    min="1"
-                  />
-                  {errors.cargoWeight && <div className="form-error">{errors.cargoWeight}</div>}
-                </div>
-              </div>
-
-              <div className="form-row">
-                {/* <div className="form-group">
-                  <label className="form-label">Cargo Size</label>
-                  <input
-                    type="text"
-                    name="cargoSize"
-                    className={`form-input ${errors.cargoSize ? 'error' : ''}`}
-                    value={formData.cargoSize}
-                    onChange={handleChange}
-                    placeholder="e.g., Large, Medium, Small"
-                  />
-                  {errors.cargoSize && <div className="form-error">{errors.cargoSize}</div>}
-                </div> */}
-
-                {/* <div className="form-group">
-                  <label className="form-label">Budget ($)</label>
-                  <input
-                    type="number"
-                    name="budget"
-                    className={`form-input ${errors.budget ? 'error' : ''}`}
-                    value={formData.budget}
-                    onChange={handleChange}
-                    placeholder="e.g., 1200"
-                    min="0"
-                    step="0.01"
-                  />
-                  {errors.budget && <div className="form-error">{errors.budget}</div>}
-                </div> */}
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Cargo Description</label>
-                <textarea
-                  name="description"
-                  className={`form-input ${errors.description ? 'error' : ''}`}
-                  value={formData.description}
-                  onChange={handleChange}
-                  rows="3"
-                  placeholder="Describe your cargo in detail (e.g., fragile electronics, heavy machinery, perishable goods)"
-                />
-                {errors.description && <div className="form-error">{errors.description}</div>}
-              </div>
-            </div>
-
-            {/* Location Information */}
-            <div className="form-section">
-              <h3><FaMapMarkerAlt /> Location Details</h3>
-              <div className="location-fields">
-                <LocationSelect
-                  label="Pickup Location *"
-                  name="pickupLocation"
-                  value={formData.pickupLocation}
-                  onChange={handleLocationChange}
-                  placeholder="Search for pickup location..."
-                  error={errors.pickupLocation}
-                />
-
-                <LocationSelect
-                  label="Delivery Location *"
-                  name="dropLocation"
-                  value={formData.dropLocation}
-                  onChange={handleLocationChange}
-                  placeholder="Search for delivery location..."
-                  error={errors.dropLocation}
-                />
-              </div>
-            </div>
-
-            {/* Date Information */}
-            {/* <div className="form-section">
-              <h3><FaCalendarAlt /> Schedule</h3>
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Pickup Date *</label>
-                  <input
-                    type="date"
-                    name="pickupDate"
-                    className={`form-input ${errors.pickupDate ? 'error' : ''}`}
-                    value={formData.pickupDate}
-                    onChange={handleChange}
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                  {errors.pickupDate && <div className="form-error">{errors.pickupDate}</div>}
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Delivery Date *</label>
-                  <input
-                    type="date"
-                    name="deliveryDate"
-                    className={`form-input ${errors.deliveryDate ? 'error' : ''}`}
-                    value={formData.deliveryDate}
-                    onChange={handleChange}
-                    min={formData.pickupDate || new Date().toISOString().split('T')[0]}
-                  />
-                  {errors.deliveryDate && <div className="form-error">{errors.deliveryDate}</div>}
-                </div>
-              </div>
-            </div> */}
-
-            {/* Submit Button */}
-            <div className="form-actions">
-              <button
-                type="button"
-                className="btn btn-secondary btn-large"
-                onClick={() => navigate('/client-home')}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary btn-large"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <div className="loading-spinner" />
-                    Submitting Request...
-                  </>
-                ) : (
-                  <>
-                    <FaTruck />
-                    Submit Booking Request
-                  </>
+                {/* Custom Vehicle Type Input - Show when "Other" is selected */}
+                {formData.vehicleType === 'other' && (
+                  <div className="form-group">
+                    <label className="form-label">Please Specify Vehicle Type *</label>
+                    <input
+                      type="text"
+                      name="customVehicleType"
+                      className={`form-input ${errors.customVehicleType ? 'error' : ''}`}
+                      value={formData.customVehicleType}
+                      onChange={handleChange}
+                      placeholder="Please specify other vehicle type"
+                    />
+                    {errors.customVehicleType && <div className="form-error">{errors.customVehicleType}</div>}
+                  </div>
                 )}
-              </button>
-            </div>
-          </form>
+
+                {selectedVehicle && formData.vehicleType !== 'other' && (
+                  <div className="vehicle-details">
+                    <h4>{selectedVehicle.name}</h4>
+                    <p><strong>Capacity:</strong> {selectedVehicle.capacity}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Cargo Information */}
+              <div className="form-section">
+                <h3>Cargo Information</h3>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Cargo Type *</label>
+                    <input
+                      type="text"
+                      name="cargoType"
+                      className={`form-input ${errors.cargoType ? 'error' : ''}`}
+                      value={formData.cargoType}
+                      onChange={handleChange}
+                      placeholder="e.g., Electronics, Furniture, Food Items"
+                    />
+                    {errors.cargoType && <div className="form-error">{errors.cargoType}</div>}
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Cargo Weight (kg)</label>
+                    <input
+                      type="number"
+                      name="cargoWeight"
+                      className={`form-input ${errors.cargoWeight ? 'error' : ''}`}
+                      value={formData.cargoWeight}
+                      onChange={handleChange}
+                      placeholder="e.g., 500"
+                      min="1"
+                    />
+                    {errors.cargoWeight && <div className="form-error">{errors.cargoWeight}</div>}
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  {/* <div className="form-group">
+                    <label className="form-label">Cargo Size</label>
+                    <input
+                      type="text"
+                      name="cargoSize"
+                      className={`form-input ${errors.cargoSize ? 'error' : ''}`}
+                      value={formData.cargoSize}
+                      onChange={handleChange}
+                      placeholder="e.g., Large, Medium, Small"
+                    />
+                    {errors.cargoSize && <div className="form-error">{errors.cargoSize}</div>}
+                  </div> */}
+
+                  {/* <div className="form-group">
+                    <label className="form-label">Budget ($)</label>
+                    <input
+                      type="number"
+                      name="budget"
+                      className={`form-input ${errors.budget ? 'error' : ''}`}
+                      value={formData.budget}
+                      onChange={handleChange}
+                      placeholder="e.g., 1200"
+                      min="0"
+                      step="0.01"
+                    />
+                    {errors.budget && <div className="form-error">{errors.budget}</div>}
+                  </div> */}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Cargo Description</label>
+                  <textarea
+                    name="description"
+                    className={`form-input ${errors.description ? 'error' : ''}`}
+                    value={formData.description}
+                    onChange={handleChange}
+                    rows="3"
+                    placeholder="Describe your cargo in detail (e.g., fragile electronics, heavy machinery, perishable goods)"
+                  />
+                  {errors.description && <div className="form-error">{errors.description}</div>}
+                </div>
+              </div>
+
+              {/* Location Information */}
+              <div className="form-section">
+                <h3><FaMapMarkerAlt /> Location Details</h3>
+                <div className="location-fields">
+                  <LocationSelect
+                    label="Pickup Location *"
+                    name="pickupLocation"
+                    value={formData.pickupLocation}
+                    onChange={handleLocationChange}
+                    placeholder="Search for pickup location..."
+                    error={errors.pickupLocation}
+                  />
+
+                  <LocationSelect
+                    label="Delivery Location *"
+                    name="dropLocation"
+                    value={formData.dropLocation}
+                    onChange={handleLocationChange}
+                    placeholder="Search for delivery location..."
+                    error={errors.dropLocation}
+                  />
+                </div>
+              </div>
+
+              {/* Date Information */}
+              {/* <div className="form-section">
+                <h3><FaCalendarAlt /> Schedule</h3>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Pickup Date *</label>
+                    <input
+                      type="date"
+                      name="pickupDate"
+                      className={`form-input ${errors.pickupDate ? 'error' : ''}`}
+                      value={formData.pickupDate}
+                      onChange={handleChange}
+                      min={new Date().toISOString().split('T')[0]}
+                    />
+                    {errors.pickupDate && <div className="form-error">{errors.pickupDate}</div>}
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Delivery Date *</label>
+                    <input
+                      type="date"
+                      name="deliveryDate"
+                      className={`form-input ${errors.deliveryDate ? 'error' : ''}`}
+                      value={formData.deliveryDate}
+                      onChange={handleChange}
+                      min={formData.pickupDate || new Date().toISOString().split('T')[0]}
+                    />
+                    {errors.deliveryDate && <div className="form-error">{errors.deliveryDate}</div>}
+                  </div>
+                </div>
+              </div> */}
+
+              {/* Submit Button */}
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-large"
+                  onClick={() => navigate('/client-home')}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-large"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <div className="loading-spinner" />
+                      Submitting Request...
+                    </>
+                  ) : (
+                    <>
+                      <FaTruck />
+                      Submit Booking Request
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+      <ClientFooter />
+    </>
   );
 }
 
