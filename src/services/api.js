@@ -197,6 +197,15 @@ export const bookingAPI = {
       headers: getAuthHeaders(),
     });
   },
+
+  // Create a discount request for a shipment
+  createDiscountRequest: async (id, requestAmount) => {
+    return apiRequest(`/shipments/${id}/discount-request`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      data: { requestAmount },
+    });
+  },
 };
 
 // Token management utilities
