@@ -161,7 +161,7 @@ function BookingDetailScreen() {
             <div className="booking-title">
               <h1>Booking Details</h1>
               <div className="booking-id-status">
-                <h2>{booking.id}</h2>
+                <h2>C360-PK-{booking.id}</h2>
                 <span 
                   className={`status-badge status-${booking.status.toLowerCase()}`}
                   style={{ color: getStatusColor(booking.status) }}

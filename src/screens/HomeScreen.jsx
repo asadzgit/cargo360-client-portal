@@ -127,7 +127,7 @@ function HomeScreen() {
                 <div key={booking.id} className="booking-card card">
                   <div className="card-header">
                     <div className="booking-header">
-                      <h4>#{booking.id}</h4>
+                      <h4>C360-PK-{booking.id}</h4>
                       <span className={`status-badge status-${booking.status.toLowerCase()}`}>
                         {humanize(booking.status)}
                       </span>

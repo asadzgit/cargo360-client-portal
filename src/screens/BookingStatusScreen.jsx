@@ -31,7 +31,8 @@ function BookingStatusScreen() {
                            booking.pickupLocation.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            booking.dropLocation.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            booking.vehicleType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           booking.cargoType.toLowerCase().includes(searchTerm.toLowerCase());
+                           booking.cargoType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           `C360-PK-${booking.id}`.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesStatus && matchesSearch;
     })
     .sort((a, b) => {
@@ -204,7 +205,7 @@ function BookingStatusScreen() {
                   <div key={booking.id} className="booking-item card fade-in">
                     <div className="booking-header">
                       <div className="booking-id">
-                        <h4>{booking.id}</h4>
+                        <h4>C360-PK-{booking.id}</h4>
                         <span className={`status-badge status-${booking.status.toLowerCase()}`}>
                           {getStatusIcon(booking.status)}
                           {humanize(booking.status)}

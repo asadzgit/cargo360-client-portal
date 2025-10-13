@@ -196,7 +196,7 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
       <div className="modal-content edit-booking-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3>
-            <FaTruck /> Edit Booking #{booking?.id}
+            <FaTruck /> Edit Booking C360-PK-{booking?.id}
           </h3>
           <button className="close-btn" onClick={onClose}>
             <FaTimes />
