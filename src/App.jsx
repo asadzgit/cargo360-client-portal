@@ -12,6 +12,8 @@ import BookTruckScreen from './screens/BookTruckScreen';
 import BookingStatusScreen from './screens/BookingStatusScreen';
 import BookingDetailScreen from './screens/BookingDetailScreen';
 import TabNavigation from './components/TabNavigation';
+import VerificationSuccess from './screens/VerificationSuccess';
+import VerificationFailure from './screens/VerificationFailure';
 import './App.css';
 
 function ProtectedRoute({ children }) {
@@ -55,6 +57,22 @@ function AppContent() {
               <SignupScreen />
             </PublicRoute>
           } 
+        />
+        <Route
+          path="/verification-success"
+          element={
+            <PublicRoute>
+              <VerificationSuccess />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/verification-failure"
+          element={
+            <PublicRoute>
+              <VerificationFailure />
+            </PublicRoute>
+          }
         />
         <Route 
           path="/confirm-account" 
