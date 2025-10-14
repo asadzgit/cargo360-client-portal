@@ -1,16 +1,21 @@
 import React from "react";
 import { FaSquareEnvelope, FaSquarePhone } from "react-icons/fa6";
 export const ClientFooter = () => (
-  <footer className="screen-footer" style={{  marginTop: 4, color: '#ffffff', background: 'linear-gradient(135deg, var(--primary-color) 0%, #02396b 100%)', padding: '2rem 0' }}>
-    <>
-    Contact support:
-    <br/>
-    <div style={{marginTop: '0.5rem'}}>
-    <FaSquareEnvelope style={{color: '#ed8411'}}/> info@cargo360pk.com
-    <span style={{margin: '0 0.5rem'}}></span>
-    <FaSquarePhone style={{color: '#ed8411'}}/> +92 333 7766609
+  <footer class="footer">
+  <div class="footer-content">
+    <p class="support-text">Contact support:</p>
+    <div class="contact-info">
+      <div class="contact-item">
+        <span class="icon">✉️</span>
+        <a href="mailto:info@cargo360pk.com">info@cargo360pk.com</a>
+      </div>
+      <div class="contact-item">
+        <span class="icon">📞</span>
+        <a href="tel:+923337766609">+92 333 7766609</a>
+      </div>
     </div>
-    <small style={{marginTop: '0.5rem'}}>© {new Date().getFullYear()} CARGO 360. All rights reserved.</small>
-    </>
-  </footer>
+    <p class="copyright">© 2025 CARGO 360. All rights reserved.</p>
+  </div>
+</footer>
+
 );

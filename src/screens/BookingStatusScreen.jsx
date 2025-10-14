@@ -192,12 +192,16 @@ function BookingStatusScreen() {
                     : "No bookings match your current filters."
                   }
                 </p>
-                <button 
+                {statusFilter === 'all' && searchTerm === '' 
+                    ? 
+                    <button 
                   className="btn btn-primary"
                   onClick={() => navigate('/book-truck')}
                 >
                   <FaTruck /> Book Your First Vehicle
                 </button>
+                    : <></>
+                  }
               </div>
             ) : (
               <div className="bookings-list">

@@ -1,9 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaTruck, FaClipboardList, FaShippingFast, FaUsers, FaEnvelope, FaShieldAlt, FaArrowRight } from 'react-icons/fa';
-import { FaGlobe, FaFileAlt, FaPaperPlane, FaAddressBook } from 'react-icons/fa';
-import { FaBuilding, FaBoxes, FaPhone, FaMapMarkerAlt, FaClock, FaMoneyBill } from 'react-icons/fa';
-import {  FaUserTie, FaHome } from 'react-icons/fa';
+import { 
+  FaTruck,
+  FaClipboardList,
+  FaShippingFast,
+  FaUsers,
+  FaEnvelope,
+  FaShieldAlt,
+  FaPlus,
+  FaGlobe,
+  FaFileAlt,
+  FaPaperPlane,
+  FaAddressBook,
+  FaArrowRight,
+  FaBuilding,
+  FaBoxes,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaClock,
+  FaMoneyBill,
+  FaUserTie,
+  FaHome
+} from 'react-icons/fa';
+import Modal from '../components/Modal'; //  import Modal
 import { useAuth } from '../context/AuthContext';
 import { useBooking } from '../context/BookingContext';
 import {ClientFooter} from '../components/ClientFooter';
@@ -14,6 +33,9 @@ function HomeScreen() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { bookings, loading, fetchBookings } = useBooking();
+
+    // ✅ for Add Clearance Doc modal
+  const [isModalOpen, setIsModalOpen] = useState(false);  
 
   useEffect(() => {
     fetchBookings();
@@ -34,8 +56,22 @@ function HomeScreen() {
           <div className="hero-content">
             <h1>Welcome back, {user?.name || 'User'}!</h1>
             {/* <p>Ready to manage your cargo transportation needs?</p> */}
-            <p>Book a vehicle or check your existing bookings below.</p>
+            <p className='hero-pera'>Book a vehicle or check your existing bookings below.</p>
             <div className="hero-actions">
+
+              {/* Add Clearance Doc button */}
+              <button 
+                className="btn btn-large text-black"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <FaPlus /> Add Clearance Doc
+              </button>
+
+              <Modal 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+              />
+
               <button 
                 className="btn btn-accent btn-large"
                 onClick={() => navigate('/book-truck')}
