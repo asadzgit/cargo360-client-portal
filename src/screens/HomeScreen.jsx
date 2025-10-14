@@ -62,6 +62,7 @@ function HomeScreen() {
               {/* Add Clearance Doc button */}
               <button 
                 className="btn btn-large text-black"
+                style={{backgroundColor: 'white'}}
                 onClick={() => setIsModalOpen(true)}
               >
                 <FaPlus /> Add Clearance Doc
