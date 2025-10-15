@@ -1,5 +1,6 @@
 import React from "react";
 import { FaSquareEnvelope, FaSquarePhone } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 export const ClientFooter = () => (
   <footer class="footer">
   <div class="footer-content">
@@ -15,6 +16,7 @@ export const ClientFooter = () => (
       </div>
     </div>
     <p class="copyright">© 2025 CARGO 360. All rights reserved.</p>
+    <p><Link to="/privacy-policy" className="link">Privacy Policy</Link></p>
   </div>
 </footer>
 

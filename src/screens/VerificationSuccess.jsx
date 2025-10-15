@@ -31,7 +31,7 @@ function VerificationSuccess() {
             <h2>Email Verified</h2>
             <p>Your account has been successfully verified. You can log in now.</p>
 
-            <div style={{ marginTop: 16 }}>
+            {/* <div style={{ marginTop: 16 }}>
             <Link to="/login" className="btn btn-primary btn-full btn-large">
                 Go to Login
             </Link>
@@ -44,7 +44,7 @@ function VerificationSuccess() {
                 Create a different account
                 </Link>
             </p>
-            </div>
+            </div> */}
         </div>
       </div>
     </div>

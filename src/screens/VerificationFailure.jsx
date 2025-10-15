@@ -19,14 +19,14 @@ function VerificationFailure() {
             email and try again.
             </p>
 
-            <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
+            {/* <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
             <Link to="/confirm-account" className="btn btn-primary btn-large">
                 Go back to confirm Account page
             </Link>
             <Link to="/login" className="btn btn-secondary btn-large">
                 Back to Login
             </Link>
-            </div>
+            </div> */}
         </div>
       </div>
     </div>

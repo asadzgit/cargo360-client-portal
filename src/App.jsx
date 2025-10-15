@@ -14,6 +14,7 @@ import BookingDetailScreen from './screens/BookingDetailScreen';
 import TabNavigation from './components/TabNavigation';
 import VerificationSuccess from './screens/VerificationSuccess';
 import VerificationFailure from './screens/VerificationFailure';
+import PrivacyPolicy from './screens/PrivacyPolicy';
 import './App.css';
 
 function ProtectedRoute({ children }) {
@@ -57,6 +58,14 @@ function AppContent() {
               <SignupScreen />
             </PublicRoute>
           } 
+        />
+        <Route
+          path="/privacy-policy"
+          element={
+            <PublicRoute>
+              <PrivacyPolicy />
+            </PublicRoute>
+          }
         />
         <Route
           path="/verification-success"
