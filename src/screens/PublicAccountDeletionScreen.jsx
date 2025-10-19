@@ -15,6 +15,7 @@ function PublicAccountDeletionScreen() {
   // Token validation states
   const [tokenValidated, setTokenValidated] = useState(false);
   const [validatingToken, setValidatingToken] = useState(false);
+  const [token, setToken] = useState('');
 
   // Mobile deletion API calls
   const validateDeletionToken = async (token) => {
@@ -34,7 +35,7 @@ function PublicAccountDeletionScreen() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ password: password, token: token }), // send token directly
     });
     if (response.ok) return await response.json();
     const errorData = await response.json();
@@ -59,9 +60,10 @@ function PublicAccountDeletionScreen() {
       setValidatingToken(true);
       setError('');
       await validateDeletionToken(token);
+      setToken(token)
       setTokenValidated(true);
       // Remove token from URL for security
-      window.history.replaceState({}, document.title, window.location.pathname);
+    //   window.history.replaceState({}, document.title, window.location.pathname);
     } catch (err) {
       setError(err?.message || 'Invalid or expired deletion link. Please try again from your mobile app.');
     } finally {
