@@ -147,7 +147,11 @@ function BookTruckScreen() {
     if (formData.budget && isNaN(parseFloat(formData.budget))) {
       newErrors.budget = 'Please enter a valid budget amount';
     }
-    
+
+    if (formData.insurance && !formData.insuranceFile) {
+      newErrors.insuranceFile = "Please attach the insurance invoice file";
+    }
+
     return newErrors;
   };
 
@@ -414,6 +418,70 @@ function BookTruckScreen() {
                   </div>
                 </div>
               </div> */}
+
+              {/* Additional Options */}
+              <div className="form-section">
+                <h3>Additional Options</h3>
+
+                <div className="checkbox-group">
+                  {/* Insurance Checkbox */}
+                  <label className="checkbox-label">
+                    <input
+                      // style={{appearance:'none',}}
+                      type="checkbox"
+                      name="insurance"
+                      checked={formData.insurance || false}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          insurance: e.target.checked,
+                        }))
+                      }
+                    />
+                    Insurance
+                  </label>
+
+                  {/* Sales Tax Invoice Checkbox */}
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="salesTax"
+                      checked={formData.salesTax || false}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          salesTax: e.target.checked,
+                        }))
+                      }
+                    />
+                    Sales Tax Invoice
+                  </label>
+                </div>
+
+                {/* File upload field appears ONLY when Insurance is checked */}
+                {formData.insurance && (
+                  <div className="form-group insurance-upload">
+                    <label className="form-label">
+                      * Attach Insurance Invoice
+                    </label>
+                    <input
+                      type="file"
+                      name="insuranceFile"
+                      className="form-input"
+                      required
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          insuranceFile: e.target.files[0],
+                        }))
+                      }
+                    />
+                  </div>
+                )}
+                {errors.insuranceFile && (
+                  <div className="form-error">{errors.insuranceFile}</div>
+                )}
+              </div>
 
               {/* Submit Button */}
               <div className="form-actions">

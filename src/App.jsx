@@ -15,6 +15,10 @@ import TabNavigation from './components/TabNavigation';
 import VerificationSuccess from './screens/VerificationSuccess';
 import VerificationFailure from './screens/VerificationFailure';
 import PrivacyPolicy from './screens/PrivacyPolicy';
+import ProfileScreen from './screens/ProfileScreen';
+import AccountDeletionScreen from './screens/AccountDeletionScreen';
+import PublicAccountDeletionScreen from './screens/PublicAccountDeletionScreen';
+
 import './App.css';
 
 function ProtectedRoute({ children }) {
@@ -99,6 +103,17 @@ function AppContent() {
             </PublicRoute>
           } 
         />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <div className="main-content">
+                <ProfileScreen />
+                <TabNavigation />
+              </div>
+            </ProtectedRoute>
+          }
+        />
         <Route 
           path="/client-home" 
           element={
@@ -143,7 +158,27 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
-      </Routes>
+        <Route 
+          path="/delete-account" 
+          element={
+            <ProtectedRoute>
+              <div className="main-content">
+                <AccountDeletionScreen />
+                <TabNavigation />
+              </div>
+            </ProtectedRoute>
+          } 
+        />
+      
+      <Route 
+          path="/delete-mobile-account" 
+          element={
+            <div className="main-content">
+              <PublicAccountDeletionScreen />
+            </div>
+          } 
+        />
+        </Routes>
     </div>
   );
 }

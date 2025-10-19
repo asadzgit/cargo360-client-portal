@@ -136,6 +136,26 @@ export const authAPI = {
   },
 };
 
+export const userAPI = {
+  updateMe: async (payload) => {
+    // payload may contain any of: { name, phone, currentPassword, newPassword }
+    return apiRequest('/users/me', {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      data: payload,
+    });
+  },
+
+  // Delete user account and all associated data
+  deleteAccount: async (password) => {
+    return apiRequest('/users/me', {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+      data: { password },
+    });
+  },
+};
+
 // Shipment/Booking API calls
 export const bookingAPI = {
   // Create a new booking (shipment)

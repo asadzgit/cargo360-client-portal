@@ -248,6 +248,67 @@ textarea.form-input {
   animation: slideInUp 0.4s ease-out;
 }
 
+/* ===== New Styles for Checkboxes & File Upload ===== */
+
+.checkbox-group {
+  display: flex;
+  gap: 2rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.checkbox-group label {
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #555;
+  border-radius: 4px;
+  background-color: white; /* white before check */
+  cursor: pointer;
+  position: relative;
+}
+
+/* Show only the tick when checked */
+.checkbox-group input[type="checkbox"]:checked::after {
+  content: "Γ£ö";
+  font-size: 20px;
+  color: black;
+  position: absolute;
+  top: -10px;
+  left: -1px;
+}
+
+
+.form-group input[type="file"] {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f9f9f9;
+  width: 100%;
+}
+
+.form-group input[type="file"]:hover {
+  border-color: #666;
+}
+
+.form-error {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+
+
 @keyframes slideInUp {
   from {
     opacity: 0;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { FaTruck, FaClipboardList, FaUser, FaHome } from 'react-icons/fa';
+import { FaTruck, FaClipboardList, FaUser, FaHome, FaIdBadge } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import './TabNavigation.css';
 
@@ -17,6 +17,7 @@ function TabNavigation() {
     { path: '/client-home', icon: FaHome, label: 'Home' },
     { path: '/book-truck', icon: FaTruck, label: 'Book' },
     { path: '/bookings', icon: FaClipboardList, label: 'Bookings' },
+    { path: '/profile', icon: FaIdBadge, label: 'Profile' },
   ];
 
   const defaultTabs = [

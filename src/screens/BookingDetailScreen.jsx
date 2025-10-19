@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaWeight, FaClock, FaPhone, FaUser, FaRoute, FaMoneyBill, FaClipboardCheck, FaTimes, FaCar, FaEdit } from 'react-icons/fa';
+import { FaArrowLeft, FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaWeight, FaClock, FaPhone, FaUser, FaRoute, FaMoneyBill, FaClipboardCheck, FaTimes, FaCar, FaEdit, FaPlus } from 'react-icons/fa';
 import { useBooking } from '../context/BookingContext';
 import LocationTrackingModal from '../components/LocationTrackingModal';
 import EditBookingModal from '../components/EditBookingModal';
 import { humanize } from '../utils/helpers';
 import { bookingAPI } from '../services/api';
 import {ClientFooter} from '../components/ClientFooter';
+import Modal from '../components/Modal';
 import './BookingDetailScreen.css';
 
 function BookingDetailScreen() {
@@ -18,6 +19,7 @@ function BookingDetailScreen() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [discountBudget, setDiscountBudget] = useState('');
   const [discountLoading, setDiscountLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const loadBooking = async () => {
@@ -28,6 +30,7 @@ function BookingDetailScreen() {
         console.error('Failed to load booking:', error);
       }
     };
+    console.log('hello world')
 
     loadBooking();
   }, [id]);
@@ -447,6 +450,18 @@ function BookingDetailScreen() {
               </button>
             )}
             
+            {/* for clearance button */}
+            <button 
+              className="btn btn-primary"
+            onClick={() => setIsModalOpen(true)}
+            >
+              <FaPlus />Add Clearance Doc
+            </button>
+            {/* Modal Component */}
+            <Modal 
+              isOpen={isModalOpen} 
+              onClose={() => setIsModalOpen(false)} 
+            />
             <button 
               className="btn btn-primary"
               onClick={() => navigate('/book-truck')}
