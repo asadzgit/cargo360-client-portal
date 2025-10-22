@@ -19,7 +19,8 @@ function BookTruckScreen() {
     cargoSize: '',
     description: '',
     budget: '',
-    customVehicleType: ''
+    customVehicleType: '',
+    numContainers:'',
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -136,21 +137,28 @@ function BookTruckScreen() {
       newErrors.cargoType = 'Cargo type must be at least 2 characters';
     }
     
-    if (formData.description && formData.description.length < 10) {
-      newErrors.description = 'Description must be at least 10 characters';
-    }
-    
-    if (formData.cargoWeight && isNaN(parseFloat(formData.cargoWeight))) {
-      newErrors.cargoWeight = 'Please enter a valid weight';
-    }
+    // ✅ Cargo Weight required
+if (!formData.cargoWeight) {
+  newErrors.cargoWeight = 'Cargo weight is required';
+} else if (isNaN(parseFloat(formData.cargoWeight))) {
+  newErrors.cargoWeight = 'Please enter a valid weight';
+}
+
+// ✅ No. of Containers/Vehicles required
+if (!formData.numContainers) {
+  newErrors.numContainers = 'Please enter number of containers/vehicles';
+} else if (isNaN(parseInt(formData.numContainers))) {
+  newErrors.numContainers = 'Please enter a valid number';
+} 
+
     
     if (formData.budget && isNaN(parseFloat(formData.budget))) {
       newErrors.budget = 'Please enter a valid budget amount';
     }
 
-    if (formData.insurance && !formData.insuranceFile) {
-      newErrors.insuranceFile = "Please attach the insurance invoice file";
-    }
+    // if (formData.insurance && !formData.insuranceFile) {
+    //   newErrors.insuranceFile = "Please attach the insurance invoice file";
+    // }
 
     return newErrors;
   };
@@ -305,7 +313,7 @@ function BookTruckScreen() {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Cargo Weight (kg)</label>
+                    <label className="form-label">Cargo Weight (kg)*</label>
                     <input
                       type="number"
                       name="cargoWeight"
@@ -314,9 +322,11 @@ function BookTruckScreen() {
                       onChange={handleChange}
                       placeholder="e.g., 500"
                       min="1"
+                      
                     />
                     {errors.cargoWeight && <div className="form-error">{errors.cargoWeight}</div>}
                   </div>
+                  
                 </div>
 
                 <div className="form-row">
@@ -349,18 +359,38 @@ function BookTruckScreen() {
                   </div> */}
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Cargo Description</label>
-                  <textarea
-                    name="description"
-                    className={`form-input ${errors.description ? 'error' : ''}`}
-                    value={formData.description}
-                    onChange={handleChange}
-                    rows="3"
-                    placeholder="Describe your cargo in detail (e.g., fragile electronics, heavy machinery, perishable goods)"
-                  />
-                  {errors.description && <div className="form-error">{errors.description}</div>}
-                </div>
+                <div className="form-row">
+  {/* Cargo Description */}
+  <div className="form-group">
+    <label className="form-label">Cargo Description </label>
+    <textarea
+      name="description"
+      className={`form-input ${errors.description ? 'error' : ''}`}
+      value={formData.description}
+      onChange={handleChange}
+      rows="1"
+      placeholder="Describe your cargo details"
+      
+    />
+    {errors.description && <div className="form-error">{errors.description}</div>}
+  </div>
+
+  {/* Number of Containers/Vehicles */}
+  <div className="form-group">
+    <label className="form-label">No. of Containers/Vehicles *</label>
+    <input
+      type="text"
+      name="numContainers"
+      className={`form-input ${errors.numContainers ? 'error' : ''}`}
+      value={formData.numContainers || ''}
+      onChange={handleChange}
+      placeholder="Number of containers/vehicles"
+      
+    />
+    {errors.numContainers && <div className="form-error">{errors.numContainers}</div>}
+  </div>
+</div>
+
               </div>
 
               {/* Location Information */}
@@ -459,7 +489,7 @@ function BookTruckScreen() {
                 </div>
 
                 {/* File upload field appears ONLY when Insurance is checked */}
-                {formData.insurance && (
+                {/* {formData.insurance && (
                   <div className="form-group insurance-upload">
                     <label className="form-label">
                       * Attach Insurance Invoice
@@ -480,7 +510,7 @@ function BookTruckScreen() {
                 )}
                 {errors.insuranceFile && (
                   <div className="form-error">{errors.insuranceFile}</div>
-                )}
+                )} */}
               </div>
 
               {/* Submit Button */}

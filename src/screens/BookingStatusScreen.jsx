@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaClipboardList, FaFilter, FaEye, FaTruck, FaArrowRight, FaClock, FaCheckCircle, FaSearch, FaTimes } from 'react-icons/fa';
+import { FaRoute,FaMapMarkerAlt,FaClipboardList, FaFilter, FaEye, FaTruck, FaArrowRight, FaClock, FaCheckCircle, FaSearch, FaTimes } from 'react-icons/fa';
 import { useBooking } from '../context/BookingContext';
 import './BookingStatusScreen.css';
 import { ClientFooter } from '../components/ClientFooter';
@@ -220,81 +220,117 @@ function BookingStatusScreen() {
                       </div>
                     </div>
                     
-                    <div className="booking-content">
-                      <div className="booking-info">
-                        <div className="info-row">
-                          <div className="info-item">
-                            <strong>Vehicle:</strong>
-                            <span>{humanize(booking.vehicleType)}</span>
-                          </div>
-                          <div className="info-item">
-                            <strong>Cargo:</strong>
-                            <span>{humanize(booking.cargoType)}</span>
-                          </div>
-                        </div>
-                        
-                        <div className="info-row">
-                          <div className="info-item">
-                            <strong>Route:</strong>
-                            <span className="route">
-                              {booking.pickupLocation.substring(0, 50).concat('...')} 
-                              <span style={{color: 'var(--success-color)'}}> <FaTruck/> <FaArrowRight/> </span>
-                              {booking.dropLocation.substring(0, 50).concat('...')}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <div className="info-row">
-                          <div className="info-item">
-                            <strong>Created:</strong>
-                            <span>{new Date(booking.createdAt).toLocaleDateString()}</span>
-                          </div>
-                          {booking.cargoWeight && (
-                            <div className="info-item">
-                              <strong>Weight:</strong>
-                              <span>{booking.cargoWeight} kg</span>
-                            </div>
-                          )}
-                        </div>
+                    {/* inside filteredBookings.map */}
+<div className="booking-content">
+  <div className="booking-info">
+    <div className="info-row">
+      <div className="info-item">
+        <strong>Vehicle:</strong>
+        <span>{humanize(booking.vehicleType)}</span>
+      </div>
+      <div className="info-item">
+        <strong>Cargo:</strong>
+        <span>{humanize(booking.cargoType)}</span>
+      </div>
+    </div>
 
-                        {booking.Trucker && (
-                          <div className="info-row">
-                            <div className="info-item">
-                              <strong>Trucker:</strong>
-                              <span>{booking.Trucker.name}</span>
-                            </div>
-                            <div className="info-item">
-                              <strong>Phone:</strong>
-                              <span>{booking.Trucker.phone}</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="booking-actions">
-                        {booking.budget && (
-                          <div className="booking-price">
-                            <strong>PKR {booking.budget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</strong>
-                          </div>
-                        )}
-                        <div className="action-buttons">
-                          <button 
-                            className="btn btn-outline"
-                            onClick={() => navigate(`/booking/${booking.id}`)}
-                          >
-                            <FaEye /> View Details
-                          </button>
-                          {booking.status === 'pending' && (
-                            <button 
-                              className="btn btn-danger btn-sm"
-                              onClick={() => handleCancelBooking(booking.id)}
-                            >
-                              <FaTimes /> Cancel
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+    <div className="info-row">
+      <div className="info-item">
+        <strong>Created:</strong>
+        <span>{new Date(booking.createdAt).toLocaleDateString()}</span>
+      </div>
+      {booking.cargoWeight && (
+        <div className="info-item">
+          <strong>Weight:</strong>
+          <span>{booking.cargoWeight} kg</span>
+        </div>
+      )}
+    </div>
+
+    {booking.Trucker && (
+      <div className="info-row">
+        <div className="info-item">
+          <strong>Trucker:</strong>
+          <span>{booking.Trucker.name}</span>
+        </div>
+        <div className="info-item">
+          <strong>Phone:</strong>
+          <span>{booking.Trucker.phone}</span>
+        </div>
+      </div>
+    )}
+  </div>
+
+  {/* RIGHT COLUMN: date -> status-card -> actions */}
+  <div className="booking-right">
+    <div className="date-compact">
+      {new Date(booking.createdAt).toLocaleDateString()}
+    </div>
+
+    <div className="status-card">
+      <div className="card-header">
+        <h3> Route Information</h3>
+      </div>
+      <div className="card-body">
+        <div className="route-display">
+          <div className="location-item pickup">
+            <FaMapMarkerAlt className="location-icon" />
+            <div className="location-details">
+              <label>Pickup Location</label>
+              <value>
+                {booking.pickupLocation.length > 50
+                  ? booking.pickupLocation.substring(0, 50).concat('...')
+                  : booking.pickupLocation}
+              </value>
+            </div>
+          </div>
+
+          <div className="route-line"></div>
+{/*  */}
+          <div className="location-item delivery">
+            <FaMapMarkerAlt className="location-icon" />
+            <div className="location-details">
+              <label>Delivery Location</label>
+              <value>
+                {booking.dropLocation.length > 50
+                  ? booking.dropLocation.substring(0, 50).concat('...')
+                  : booking.dropLocation}
+              </value>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div className="booking-actions">
+      <div className='view-btn'>
+      {booking.budget && (
+        <div className="booking-price">
+          <strong>PKR {booking.budget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</strong>
+        </div>
+      )}
+      <div className="action-buttons">
+        <button
+          className="btn btn-outline"
+          onClick={() => navigate(`/booking/${booking.id}`)}
+        >
+          <FaEye /> View Details
+        </button>
+      </div>
+        {booking.status === 'pending' && (
+          <button
+            className="btn btn-danger btn-sm" style={{color:'white'}}
+            onClick={() => handleCancelBooking(booking.id)}
+          >
+            <FaTimes /> Cancel
+          </button>
+        )}
+      </div>
+    </div>
+    {/* --- */}
+  </div>
+</div>
+
                   </div>
                 ))}
               </div>

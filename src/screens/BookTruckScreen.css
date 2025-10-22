@@ -93,11 +93,27 @@
 .form-select.error {
   border-color: var(--error-color);
 }
+.form-error {
+  color: #dc2626;
+  font-size: 14px;
+  margin-top: 4px;
+}
 
 textarea.form-input {
-  resize: vertical;
-  min-height: 100px;
+  resize: none;
+  height: 52px;       /* same as input height */
+  min-height: auto;
+  padding: 14px 16px; /* same padding as input */
+  font-size: 16px;
+  overflow-y: scroll; /* allows scrolling */
+  scrollbar-width: none; /* hides scrollbar in Firefox */
 }
+
+/* hides scrollbar in Chrome, Edge, Safari */
+textarea.form-input::-webkit-scrollbar {
+  display: none;
+}
+
 
 .vehicle-details {
   background: rgba(1, 48, 78, 0.05);
@@ -280,7 +296,7 @@ textarea.form-input {
 
 /* Show only the tick when checked */
 .checkbox-group input[type="checkbox"]:checked::after {
-  content: "Γ£ö";
+  content: "✔";
   font-size: 20px;
   color: black;
   position: absolute;

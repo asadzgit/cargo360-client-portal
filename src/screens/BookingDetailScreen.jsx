@@ -148,6 +148,38 @@ function BookingDetailScreen() {
     }
   };
 
+  // Converts numbers to words (simple PKR format)
+const numberToWords = (num) => {
+  if (num === 0) return "Zero Only";
+
+  const a = [
+    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
+    "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen",
+    "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
+  ];
+  const b = [
+    "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
+  ];
+
+  const numToWords = (n) => {
+    if (n < 20) return a[n];
+    if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
+    if (n < 1000)
+      return a[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " " + numToWords(n % 100) : "");
+    if (n < 1000000)
+      return numToWords(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + numToWords(n % 1000) : "");
+    if (n < 1000000000)
+      return numToWords(Math.floor(n / 1000000)) + " Million" + (n % 1000000 ? " " + numToWords(n % 1000000) : "");
+    return num.toString();
+  };
+
+  return numToWords(num) + " Only";
+};
+
+// Just to check the the amount in words is working or not
+// const testBudget = 508000; // Try changing this value
+// console.log(numberToWords(testBudget));
+
   return (
     <>
       <div className="booking-detail-screen">
@@ -229,11 +261,12 @@ function BookingDetailScreen() {
                       </div>
                     </div>
                     
-                    <div className="route-line">
+                    <div className="route-line BookingDetailroute-line">
                       <div className="distance-info">
                         Route
                       </div>
                     </div>
+                    {/* {----} */}
                     
                     <div className="location-item delivery">
                       <FaMapMarkerAlt className="location-icon" />
@@ -395,15 +428,32 @@ function BookingDetailScreen() {
                       )}
                     </>
                   )}
+
                     {booking.budget && (
-                      <>
-                        <p style={{color: 'white'}}>Best price after discussion with several brokers</p>
-                        <div className="price-item total">
-                          <label>Budget</label>
-                          <value>PKR {booking.budget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</value>
-                        </div>
-                      </>
-                    )}
+  <>
+    <p style={{color: 'white'}}>Best price after discussion with several brokers</p>
+    <div className="price-item total">
+      <label>Budget</label>
+      <value>PKR {booking.budget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</value>
+    </div>
+    <div style={{
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: '-2px',
+  color: 'var(--accent-color)',
+  fontWeight: 600,
+  fontSize: '15px'
+}}>
+  <span>Amount in words</span>
+  <span>{numberToWords(booking.budget)}</span>
+  {/* <span>{numberToWords(750000)}</span>   Try changing this number */}
+
+</div>
+
+  </>
+)}
+
                     {!booking.budget && (
                       <div className="price-item">
                         <label>Pricing</label>
@@ -451,17 +501,17 @@ function BookingDetailScreen() {
             )}
             
             {/* for clearance button */}
-            <button 
+            {/* <button 
               className="btn btn-primary"
             onClick={() => setIsModalOpen(true)}
             >
               <FaPlus />Add Clearance Doc
-            </button>
+            </button> */}
             {/* Modal Component */}
-            <Modal 
+            {/* <Modal 
               isOpen={isModalOpen} 
               onClose={() => setIsModalOpen(false)} 
-            />
+            /> */}
             <button 
               className="btn btn-primary"
               onClick={() => navigate('/book-truck')}

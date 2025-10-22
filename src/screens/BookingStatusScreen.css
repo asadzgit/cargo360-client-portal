@@ -183,13 +183,15 @@
 .booking-content {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  padding: 0 24px 24px 24px;
+  align-items: flex-start;
+  position: relative;
+  padding: 0px 24px 24px 24px;
   gap: 24px;
 }
 
 .booking-info {
   flex: 1;
+  min-width: 0;
 }
 
 .info-row {
@@ -229,12 +231,20 @@
   color: var(--primary-color);
 }
 
-.booking-actions {
-  display: flex;
+.booking-actions .view-btn{
+  /* display: flex;
   flex-direction: column;
   align-items: flex-end;
+  justify-content: flex-end; 
   gap: 16px;
-  flex-shrink: 0;
+  flex-shrink: 0; */
+    display: flex;
+    flex-direction: column;
+    /* align-items: flex-end; */
+    gap: 8px;
+    min-width: 171px;
+    margin-right: 939px;
+    margin-top: -80px;
 }
 
 .booking-price {
@@ -281,7 +291,7 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .booking-status-screen {
-    padding: 20px 0;
+    padding: 40px 10px;
   }
   
   .screen-header h1 {
@@ -407,3 +417,181 @@
 .search-input:hover {
   border-color: rgba(1, 48, 78, 0.3);
 }
+
+
+/* Smaller version of BookingDetailScreen cards for BookingStatusScreen */
+
+/* Layout for booking-content */
+.booking-content {
+  display: flex;
+  gap: 24px;
+  padding: 0 24px 24px 24px;
+  position: relative; /* keep as context if needed */
+  align-items: flex-start; /* keep booking-info items at top */
+}
+
+/* Left column (keeps content at top) */
+.booking-info {
+  flex: 1;
+  min-width: 0; /* useful to prevent overflow */
+}
+
+/* New right column: stacks date -> status-card -> actions */
+.booking-right {
+  width: 460px;                 /* controls how far right the card sits--- */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;        /* align elements to the right edge */
+  gap: 12px;
+  margin-top: -80px;
+}
+
+/* compact date style shown in right column */
+.date-compact {
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 500;
+  align-self: flex-end;
+}
+
+/* Status card becomes a normal flow item inside booking-right */
+.status-card {
+  position: relative;   /* no absolute positioning */
+  width: 140%;          /* fills the right column */
+  margin: 0;            /* remove old margins */
+  /* padding: 1px 5px; */
+  border-radius: 10px;
+  /* box-shadow: 0 2px 8px rgba(0,0,0,0.08); */
+  background: white;
+  z-index: 2;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+/* Ensure actions align right and sit below the card */
+.booking-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* Keep action buttons consistent width on right column */
+.booking-actions .action-buttons .btn {
+  min-width: 140px;
+}
+
+/* Hide the original date shown in header on wide screens (we show date in booking-right) */
+.booking-header .booking-date {
+  display: none;
+}
+.route-line::before {
+  content: '';
+  position: absolute;
+  left: 31px;
+  top: -40%;
+  width: 3px;
+  height: 30px;
+  /* background: linear-gradient(to bottom, var(--success-color), var(--accent-color)); */
+  transform: translateY(-50%);
+}
+
+
+/* Fix for small screens: status-card spacing and stacking */
+@media (max-width: 768px) {
+
+  /* Keep content stacked nicely */
+  .booking-content {
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 16px 16px 25px;
+    position: relative;
+  }
+
+  /* Right column (date, status-card, button) */
+  .booking-right {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch; /* keep elements aligned left */
+    margin-top: 0; /* remove negative margin */
+    gap: 16px; /* add comfortable spacing between elements */
+  }
+
+  /* Keep date at top-right corner */
+  .booking-date {
+    align-self: flex-end;
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 4px;
+  }
+
+  /* Status card below the date, full width with spacing */
+  .status-card {
+    width: 120%;
+    font-size: 13px;
+    margin-top: -85px;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: white;
+    /* box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); */
+    margin-left: -40px;
+  }
+
+  /* Keep button section separated nicely */
+  .booking-actions {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 78px;
+    gap: 20px;
+    flex-wrap: wrap; /* ensures wrapping on smaller tablets */
+  }
+
+  .booking-actions .action-buttons {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .booking-actions .btn {
+    width: auto;
+    min-width: 170px;
+  }
+  .view-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    margin: 0; /* remove the large negative margins */
+  }
+  .location-details{
+    padding: 15px;
+  }
+
+}
+
+/* For very small screens (≤480px), increase space */
+@media (max-width: 480px) {
+  .booking-right {
+    gap: 18px;
+  }
+
+  .status-card {
+    margin-bottom: -10px;
+  }
+
+  /* .booking-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  } */
+
+  .booking-actions .btn {
+    width: 100%;
+    margin-top: -3px;
+
+  }
+}
+
+
+/* --- */

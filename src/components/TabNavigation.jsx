@@ -15,8 +15,8 @@ function TabNavigation() {
 
   const tabs = [
     { path: '/client-home', icon: FaHome, label: 'Home' },
-    { path: '/book-truck', icon: FaTruck, label: 'Book' },
-    { path: '/bookings', icon: FaClipboardList, label: 'Bookings' },
+    { path: '/book-truck', icon: FaTruck, label: 'Book Truck' },
+    { path: '/bookings', icon: FaClipboardList, label: 'My Bookings' },
     { path: '/profile', icon: FaIdBadge, label: 'Profile' },
   ];
 

@@ -145,13 +145,15 @@
 .route-display {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 3px;
 }
 
 .location-item {
   display: flex;
   align-items: flex-start;
   gap: 16px;
+  margin-top: -40px;
+  padding-bottom: 26px;
 }
 
 .location-icon {
@@ -173,6 +175,9 @@
   flex-direction: column;
   gap: 6px;
 }
+.location-details label{
+  font-weight: 550;
+}
 
 .route-line {
   display: flex;
@@ -182,12 +187,12 @@
   margin: 10px 0;
 }
 
-.route-line::before {
+.BookingDetailroute-line::before {
   content: '';
   position: absolute;
-  left: 10px;
-  top: 50%;
-  width: 2px;
+  left: 31px;
+  top: -50%;
+  width: 3px;
   height: 30px;
   background: linear-gradient(to bottom, var(--success-color), var(--accent-color));
   transform: translateY(-50%);
@@ -201,6 +206,8 @@
   font-weight: 600;
   color: var(--text-light);
   margin-left: 40px;
+  margin-bottom: 30px;
+  margin-top: -30px;
 }
 
 /* Driver Information */
