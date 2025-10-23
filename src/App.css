@@ -137,6 +137,19 @@ p {
   color: white;
 }
 
+.btn-cancel-outline {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 2px solid black;
+  /* outline: none; */
+}
+
+.btn-cancel-outline:hover {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: black;  
+}
+
 .btn-full {
   width: 100%;
 }

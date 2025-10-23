@@ -319,7 +319,7 @@ function BookingStatusScreen() {
       </div>
         {booking.status === 'pending' && (
           <button
-            className="btn btn-danger btn-sm" style={{color:'white'}}
+            className="btn btn-cancel-outline"
             onClick={() => handleCancelBooking(booking.id)}
           >
             <FaTimes /> Cancel
