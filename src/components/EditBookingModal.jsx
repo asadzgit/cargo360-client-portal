@@ -15,7 +15,9 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
     cargoSize: '',
     description: '',
     budget: '',
-    customVehicleType: ''
+    customVehicleType: '',
+    insurance: false,   
+    salesTax: false 
   });
   const [errors, setErrors] = useState({});
   const [showSuccess, setShowSuccess] = useState(false);
@@ -79,7 +81,8 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
         cargoSize: booking.cargoSize || '',
         description: booking.description || '',
         budget: booking.budget || '',
-        customVehicleType: isCustomVehicle ? booking.vehicleType : ''
+        customVehicleType: isCustomVehicle ? booking.vehicleType : '',
+        numContainers: booking.numContainers !== undefined && booking.numContainers !== null ? booking.numContainers : ''
       });
       setErrors({});
       setShowSuccess(false);
@@ -90,6 +93,22 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "numContainers") {
+    if (value && parseInt(value) > 100) {
+      setErrors(prev => ({
+        ...prev,
+        numContainers: "Number cannot exceed 100"
+      }));
+    } else {
+      setErrors(prev => ({
+        ...prev,
+        numContainers: ""
+      }));
+    }
+  }
+
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -150,6 +169,20 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
     if (formData.dropLocation && formData.dropLocation.length < 5) {
       newErrors.dropLocation = 'Delivery location must be at least 5 characters';
     }
+
+    // ✅ Make these required:
+    if (!formData.cargoWeight) newErrors.cargoWeight = 'Please enter cargo weight';
+    if (!formData.cargoSize) newErrors.cargoSize = 'Please enter cargo size';
+    if (!formData.budget) newErrors.budget = 'Please enter budget';
+
+    // ✅ No. of Containers/Vehicles required + Limit check
+    if (!formData.numContainers) {
+      newErrors.numContainers = 'Please enter number of containers/vehicles';
+    } else if (isNaN(parseInt(formData.numContainers))) {
+      newErrors.numContainers = 'Please enter a valid number';
+    } else if (parseInt(formData.numContainers) > 100) {
+      newErrors.numContainers = 'Number cannot exceed 100';
+    }
     
     return newErrors;
   };
@@ -172,7 +205,10 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
         description: formData.description,
         cargoWeight: formData.cargoWeight ? parseFloat(formData.cargoWeight) : undefined,
         cargoSize: formData.cargoSize || undefined,
-        budget: formData.budget ? parseFloat(formData.budget) : undefined
+        budget: formData.budget ? parseFloat(formData.budget) : undefined,
+        numContainers: formData.numContainers ? parseInt(formData.numContainers, 10) : undefined,
+        insurance: formData.insurance, 
+        salesTax: formData.salesTax 
       };
 
       await updateBooking(booking.id, updateData);
@@ -198,7 +234,7 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
           <h3>
             <FaTruck /> Edit Booking C360-PK-{booking?.id}
           </h3>
-          <button className="close-btn" onClick={onClose}>
+          <button className="modal-close-btn" onClick={onClose}>
             <FaTimes />
           </button>
         </div>
@@ -298,7 +334,7 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Cargo Weight (kg)</label>
+                  <label className="form-label">Cargo Weight (kg)*</label>
                   <input
                     type="number"
                     name="cargoWeight"
@@ -314,7 +350,7 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
 
               <div className="form-row">
                 <div className="form-group">
-                  <label className="form-label">Cargo Size</label>
+                  <label className="form-label">Cargo Size*</label>
                   <input
                     type="text"
                     name="cargoSize"
@@ -327,7 +363,7 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Budget (PKR)</label>
+                  <label className="form-label">Budget (PKR)*</label>
                   <input
                     type="number"
                     name="budget"
@@ -341,19 +377,80 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Cargo Description</label>
-                <textarea
-                  name="description"
-                  className={`form-input ${errors.description ? 'error' : ''}`}
-                  value={formData.description}
-                  onChange={handleChange}
-                  rows="3"
-                  placeholder="Describe your cargo in detail (e.g., fragile electronics, heavy machinery, perishable goods)"
-                />
-                {errors.description && <div className="form-error">{errors.description}</div>}
+               {/* DESCRIPTION + NUMBER OF CONTAINERS in same row */}
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Cargo Description</label>
+                  <textarea
+                    name="description"
+                    className={`form-input ${errors.description ? 'error' : ''}`}
+                    value={formData.description}
+                    onChange={handleChange}
+                    rows="3"
+                    placeholder="Cargo detail (e.g,electronics, heavy machinery, goods)"
+                  />
+                  {errors.description && <div className="form-error">{errors.description}</div>}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">No. of Containers/Vehicles *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    name="numContainers"
+                    className={`form-input ${errors.numContainers ? 'error' : ''}`}
+                    value={formData.numContainers}
+                    onChange={handleChange}
+                    placeholder="Number of containers/vehicles (not more than 100)"
+                  />
+                  {errors.numContainers && <div className="form-error">{errors.numContainers}</div>}
+                </div>
               </div>
             </div>
+
+            {/* Additional Options */}
+<div className="form-section">
+  <h4>Additional Options</h4>
+
+  <div className="checkbox-group">
+    {/* Insurance Checkbox */}
+    <label className="checkbox-label">
+      <input
+        type="checkbox"
+        name="insurance"
+        checked={formData.insurance}
+        onChange={(e) =>
+          setFormData(prev => ({
+            ...prev,
+            insurance: e.target.checked
+          }))
+        }
+      />
+      Insurance
+    </label>
+
+    {/* Sales Tax Invoice Checkbox */}
+    <label className="checkbox-label">
+      <input
+        type="checkbox"
+        name="salesTax"
+        checked={formData.salesTax}
+        onChange={(e) =>
+          setFormData(prev => ({
+            ...prev,
+            salesTax: e.target.checked
+          }))
+        }
+      />
+      Sales Tax Invoice
+    </label>
+  </div>
+</div>
+
+
+            
+
 
             {errors.submit && <div className="form-error">{errors.submit}</div>}
 

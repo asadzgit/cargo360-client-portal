@@ -72,6 +72,16 @@ function BookTruckScreen() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+     // ✅ Special validation for numContainers
+  if (name === "numContainers") {
+    if (value < 1 || value > 100) {
+      setErrors(prev => ({ ...prev, numContainers: "Value must be between 1 and 100" }));
+    } else {
+      setErrors(prev => ({ ...prev, numContainers: "" }));
+    }
+  }
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -384,7 +394,7 @@ if (!formData.numContainers) {
     <input
       type="number"
       min="1"
-      max="20"
+      max="100"
       name="numContainers"
       className={`form-input ${errors.numContainers ? 'error' : ''}`}
       value={formData.numContainers || ''}

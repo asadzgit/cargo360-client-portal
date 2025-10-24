@@ -101,6 +101,22 @@
   font-size: 0.9rem;
 }
 
+textarea.form-input {
+  resize: none;
+  height: 52px;       /* same as input height */
+  min-height: auto;
+  padding: 14px 16px; /* same padding as input */
+  font-size: 16px;
+  overflow-y: scroll; /* allows scrolling */
+  scrollbar-width: none; /* hides scrollbar in Firefox */
+}
+
+/* hides scrollbar in Chrome, Edge, Safari */
+textarea.form-input::-webkit-scrollbar {
+  display: none;
+}
+
+
 .success-message {
   display: flex;
   flex-direction: column;
