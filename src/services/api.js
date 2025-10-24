@@ -172,6 +172,9 @@ export const bookingAPI = {
         cargoWeight: bookingData.cargoWeight,
         cargoSize: bookingData.cargoSize,
         budget: bookingData.budget,
+        numberOfVehicles: bookingData.numberOfVehicles,
+        insurance: bookingData.insurance,
+        salesTax: bookingData.salesTax,
       },
     });
   },

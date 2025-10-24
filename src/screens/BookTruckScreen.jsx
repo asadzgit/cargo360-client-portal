@@ -184,7 +184,10 @@ if (!formData.numContainers) {
         description: formData.description,
         cargoWeight: formData.cargoWeight ? parseFloat(formData.cargoWeight) : undefined,
         cargoSize: formData.cargoSize || undefined,
-        budget: formData.budget ? parseFloat(formData.budget) : undefined
+        budget: formData.budget ? parseFloat(formData.budget) : undefined,
+        numberOfVehicles: formData.numContainers ? parseInt(formData.numContainers) : undefined,
+        insurance: formData.insurance || undefined,
+        salesTax: formData.salesTax || undefined,
       };
 
       const response = await createBooking(bookingData);
@@ -379,7 +382,9 @@ if (!formData.numContainers) {
   <div className="form-group">
     <label className="form-label">No. of Containers/Vehicles *</label>
     <input
-      type="text"
+      type="number"
+      min="1"
+      max="20"
       name="numContainers"
       className={`form-input ${errors.numContainers ? 'error' : ''}`}
       value={formData.numContainers || ''}
