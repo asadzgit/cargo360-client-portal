@@ -247,6 +247,11 @@ function BookingStatusScreen() {
       )}
     </div>
 
+    <div className="info-row">
+      <div className='info-item'><strong>Insurance:</strong> <span>{booking.insurance ? "Yes" : "No"}</span></div>
+      <div className='info-item'><strong>Sales Tax Invoice:</strong> {booking.salesTax ? "Yes" : "No"}</div>
+    </div>
+
     {booking.Trucker && (
       <div className="info-row">
         <div className="info-item">
@@ -290,7 +295,7 @@ function BookingStatusScreen() {
           <div className="location-item delivery">
             <FaMapMarkerAlt className="location-icon" />
             <div className="location-details">
-              <label>Delivery Location</label>
+              <label>Drop Off Location</label>
               <value>
                 {booking.dropLocation.length > 50
                   ? booking.dropLocation.substring(0, 50).concat('...')

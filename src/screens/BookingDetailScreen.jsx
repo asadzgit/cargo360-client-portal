@@ -238,14 +238,21 @@ const numberToWords = (num) => {
                         <value>{booking.cargoSize}</value>
                       </div>
                     )} */}
-                  </div>
-                  <div className="info-item full-width">
-                    <label>Cargo Description</label>
-                    <value>{booking.description}</value>
+                      <div className="info-item ">
+                        <label>Cargo Description</label>
+                        <value>{booking.description || "No description was given"}</value>
+                      </div>
+                      <div className='info-item'>
+                        <label>Insurance:</label> 
+                        <value>{booking.insurance ? "Yes" : "No"}</value>
+                      </div>
+                      <div className='info-item'>
+                        <label>Sales Tax Invoice:</label> 
+                        <value>{booking.salesTax ? "Yes" : "No"}</value>
+                      </div>
                   </div>
                 </div>
               </div>
-
               {/* Route Information */}
               <div className="detail-card">
                 <div className="card-header">
@@ -271,7 +278,7 @@ const numberToWords = (num) => {
                     <div className="location-item delivery">
                       <FaMapMarkerAlt className="location-icon" />
                       <div className="location-details">
-                        <label>Delivery Location</label>
+                        <label>Drop Off Location</label>
                         <value>{booking.dropLocation}</value>
                       </div>
                     </div>

@@ -60,12 +60,9 @@
 .form-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
+  /* gap: 24px; */
 }
 
-.form-group {
-  margin-bottom: 24px;
-}
 
 .form-group:last-child {
   margin-bottom: 0;
@@ -101,7 +98,7 @@
 
 textarea.form-input {
   resize: none;
-  height: 52px;       /* same as input height */
+  height: 52px; /* same as input height */
   min-height: auto;
   padding: 14px 16px; /* same padding as input */
   font-size: 16px;
@@ -113,7 +110,6 @@ textarea.form-input {
 textarea.form-input::-webkit-scrollbar {
   display: none;
 }
-
 
 .vehicle-details {
   background: rgba(1, 48, 78, 0.05);
@@ -204,40 +200,36 @@ textarea.form-input::-webkit-scrollbar {
   .book-truck-screen {
     padding: 20px 0;
   }
-  
+
   .screen-header {
     margin-bottom: 32px;
   }
-  
+
   .screen-header h1 {
     font-size: 1.75rem;
   }
-  
+
   .form-section {
     padding: 24px 20px;
   }
-  
+
   .form-row {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .form-actions {
     padding: 24px 20px;
     flex-direction: column;
   }
-  
+
   .form-actions .btn {
     min-width: auto;
     width: 100%;
   }
-  
+
   .success-container {
     padding: 60px 20px;
-  }
-  
-  .success-icon {
-    font-size: 60px;
   }
 }
 
@@ -246,16 +238,19 @@ textarea.form-input::-webkit-scrollbar {
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .form-section h3 {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .booking-form {
     margin: 0 -16px;
     border-radius: 0;
+  }
+  .form-row{
+    margin-bottom: 27px;
   }
 }
 
@@ -304,7 +299,6 @@ textarea.form-input::-webkit-scrollbar {
   left: -1px;
 }
 
-
 .form-group input[type="file"] {
   padding: 6px;
   border: 1px solid #ccc;
@@ -322,8 +316,6 @@ textarea.form-input::-webkit-scrollbar {
   font-size: 0.9rem;
   margin-top: 4px;
 }
-
-
 
 @keyframes slideInUp {
   from {
@@ -351,4 +343,15 @@ textarea.form-input::-webkit-scrollbar {
 .form-select:focus-visible {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
+}
+
+/* Force exactly two columns (for Booking Date + Delivery Date row only) */
+.two-col-row {
+  display: flex;
+  gap: 15px;
+}
+
+.two-col-row .form-group {
+  flex: 1;
+  /* margin-bottom: 15px; */
 }

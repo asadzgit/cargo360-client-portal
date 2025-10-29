@@ -19,7 +19,7 @@ function ExportsForm({ onSubmit }) {
     "pol",
     "pod",
     "product",
-    "exWorks",
+    "incoTerms",
   ];
 
   // Submit handler
@@ -72,7 +72,7 @@ function ExportsForm({ onSubmit }) {
     "pol",
     "pod",
     "product",
-    "exWorks",
+    "incoTerms",
   ];
 
   // ✅ Updated Labels
@@ -84,7 +84,7 @@ function ExportsForm({ onSubmit }) {
       pol: "Port of Loading",
       pod: "Port of Discharge",
       product: "Product/Items",
-      exWorks: "Ex-works",
+      incoTerms: "Incoterms",
       others: "Others",
     };
     return labels[docType] || docType;
@@ -92,7 +92,7 @@ function ExportsForm({ onSubmit }) {
 
   // Distinguish text vs file fields
   const isTextField = (docType) =>
-    ["pol", "pod", "product", "exWorks"].includes(docType);
+    ["pol", "pod", "product", "incoTerms"].includes(docType);
 
   const textFields = getDocumentList().filter(isTextField);
   const fileFields = getDocumentList().filter((doc) => !isTextField(doc));
@@ -267,7 +267,11 @@ function ExportsForm({ onSubmit }) {
                   value={formData.files[docType] || ""}
                   onChange={(e) => handleTextChange(docType, e.target.value)}
                   className="w-full border rounded-lg p-2 text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
-                  placeholder={`Enter ${getLabel(docType)}`}
+                   placeholder={
+                    docType === "incoTerms"
+                      ? "e.g: FOB, CFR, Ex-Works, etc"
+                      : `Enter ${getLabel(docType)}`
+                  }
                 />
                 {errors[docType] && (
                   <p className="text-red-500 text-xs mt-1 error-msg" style={{color:'red'}}>

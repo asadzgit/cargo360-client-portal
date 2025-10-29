@@ -306,7 +306,7 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
                 />
 
                 <LocationSelect
-                  label="Delivery Location *"
+                  label="Drop Off Location *"
                   name="dropLocation"
                   value={formData.dropLocation}
                   onChange={handleLocationChange}

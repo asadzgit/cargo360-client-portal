@@ -18,7 +18,7 @@ function FreightForm({ onSubmit }) {
       pol: "Port Of Loading",
       pod: "Port Of Discharge",
       product: "Product/Items",
-      exWorks: "Ex-works",
+      incoTerms: "Incoterms",
       containerSize: "Size of Container",
       numberOfContainers: "No. of Containers",
       commonInvoices: "Commercial Invoices",
@@ -33,7 +33,7 @@ function FreightForm({ onSubmit }) {
   const getFields = () => {
     const { tradeType, containerType } = formData;
     if (tradeType === "Import" && containerType === "LCL") {
-      return ["cbm", "pkgs", "pol", "pod", "product", "exWorks"];
+      return ["cbm", "pkgs", "pol", "pod", "product", "incoTerms"];
     }
     if (tradeType === "Import" && containerType === "FCL") {
       return [
@@ -53,7 +53,7 @@ function FreightForm({ onSubmit }) {
         "pol",
         "pod",
         "product",
-        "exWorks",
+        "incoTerms",
         "commonInvoices",
         "packingLists",
         "insurance",
@@ -67,7 +67,7 @@ function FreightForm({ onSubmit }) {
         "pol",
         "pod",
         "product",
-        "exWorks",
+        "incoTerms",
         "commonInvoices",
         "packingLists",
         "insurance",
@@ -84,7 +84,7 @@ function FreightForm({ onSubmit }) {
       "pol",
       "pod",
       "product",
-      "exWorks",
+      "incoTerms",
       "containerSize",
       "numberOfContainers",
     ].includes(docType);
@@ -266,7 +266,11 @@ function FreightForm({ onSubmit }) {
                     type="text"
                     value={formData.fields[field] || ""}
                     onChange={(e) => handleTextChange(field, e.target.value)}
-                    placeholder={`Enter ${getLabel(field)}`}
+                    placeholder={
+                      field === "incoTerms"
+                      ? "e.g: FOB, CFR, Ex-Works, etc"
+                      : `Enter ${getLabel(field)}`
+                    }
                     className="w-full border rounded-lg p-2 text-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-500"
                   />
                 )}
