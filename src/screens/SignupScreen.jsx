@@ -8,6 +8,7 @@ function SignupScreen() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    company: '',
     phone: '',
     password: '',
     confirmPassword: ''
@@ -27,12 +28,16 @@ function SignupScreen() {
   };
 
   const validateForm = () => {
-    if (!formData.name || !formData.email || !formData.phone || !formData.password || !formData.confirmPassword) {
+    if (!formData.name || !formData.email || !formData.company || !formData.phone || !formData.password || !formData.confirmPassword) {
       return 'Please fill in all fields';
     }
     
     if (formData.name.length < 2) {
       return 'Name must be at least 2 characters';
+    }
+
+    if (formData.company.length < 2) { // 🔹 Added company name length validation
+      return 'Company name must be at least 2 characters';
     }
     
     if (formData.phone.length < 6) {
@@ -71,6 +76,7 @@ function SignupScreen() {
       const response = await signup({
         name: formData.name,
         email: formData.email,
+        company: formData.company, // 🔹 Include company in signup data
         phone: formData.phone,
         password: formData.password
       });
@@ -122,6 +128,20 @@ function SignupScreen() {
               onChange={handleChange}
               placeholder="Enter your email"
               autoComplete="email"
+            />
+          </div>
+
+          {/* 🔹 Added new Company Name field */}
+          <div className="form-group">
+            <label className="form-label">Company Name</label>
+            <input
+              type="text"
+              name="company"
+              className="form-input"
+              value={formData.company}
+              onChange={handleChange}
+              placeholder="Enter your company name"
+              autoComplete="organization"
             />
           </div>
 

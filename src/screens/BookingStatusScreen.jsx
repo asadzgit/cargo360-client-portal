@@ -246,12 +246,6 @@ function BookingStatusScreen() {
         </div>
       )}
     </div>
-
-    <div className="info-row">
-      <div className='info-item'><strong>Insurance:</strong> <span>{booking.insurance ? "Yes" : "No"}</span></div>
-      <div className='info-item'><strong>Sales Tax Invoice:</strong> {booking.salesTax ? "Yes" : "No"}</div>
-    </div>
-
     {booking.Trucker && (
       <div className="info-row">
         <div className="info-item">
@@ -264,6 +258,11 @@ function BookingStatusScreen() {
         </div>
       </div>
     )}
+
+     {/* <div className="info-row">
+      <div className='info-item'><strong>Insurance:</strong> <span>{booking.insurance ? "Yes" : "No"}</span></div>
+      <div className='info-item'><strong>Sales Tax Invoice:</strong> {booking.salesTax ? "Yes" : "No"}</div>
+    </div> */}
   </div>
 
   {/* RIGHT COLUMN: date -> status-card -> actions */}

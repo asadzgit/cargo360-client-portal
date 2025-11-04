@@ -547,6 +547,7 @@ function BookTruckScreen() {
                       value={formData.bookingDate}
                       onChange={handleChange}
                       placeholder="Booking Date"
+                      disabled
                     />
                     {errors.bookingDate && (
                       <div className="form-error">{errors.bookingDate}</div>
