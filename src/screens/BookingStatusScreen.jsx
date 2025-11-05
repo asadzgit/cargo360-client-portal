@@ -21,6 +21,15 @@ function BookingStatusScreen() {
     fetchBookings();
   }, []);
 
+  // Format date as DD/MM/YYYY
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   // Filter and sort bookings
 
   const filteredBookings = bookings
@@ -216,7 +225,7 @@ function BookingStatusScreen() {
                         </span>
                       </div>
                       <div className="booking-date">
-                        {new Date(booking.createdAt).toLocaleDateString()}
+                        {formatDate(booking.createdAt)}
                       </div>
                     </div>
                     
@@ -237,7 +246,7 @@ function BookingStatusScreen() {
     <div className="info-row">
       <div className="info-item">
         <strong>Created:</strong>
-        <span>{new Date(booking.createdAt).toLocaleDateString()}</span>
+        <span>{formatDate(booking.createdAt)}</span>
       </div>
       {booking.cargoWeight && (
         <div className="info-item">
@@ -268,7 +277,7 @@ function BookingStatusScreen() {
   {/* RIGHT COLUMN: date -> status-card -> actions */}
   <div className="booking-right">
     <div className="date-compact">
-      {new Date(booking.createdAt).toLocaleDateString()}
+      {formatDate(booking.createdAt)}
     </div>
 
     <div className="status-card">

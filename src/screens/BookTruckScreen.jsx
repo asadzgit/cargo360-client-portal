@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FaTruck,
@@ -40,6 +40,119 @@ function BookTruckScreen() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  // --- DATE HANDLERS & VALIDATORS ---
+const [bookingDateDisplay, setBookingDateDisplay] = useState("");
+const [deliveryDateDisplay, setDeliveryDateDisplay] = useState("");
+
+// inside your component
+useEffect(() => {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, "0");
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const yyyy = today.getFullYear();
+  const formatted = `${dd}/${mm}/${yyyy}`;
+
+  // Show formatted date in display
+  setBookingDateDisplay(formatted);
+
+  // Save in ISO format for backend
+  const iso = `${yyyy}-${mm}-${dd}`;
+  setFormData((prev) => ({ ...prev, bookingDate: iso }));
+}, []);
+
+
+// Format user input (DD/MM/YYYY) and limit to valid day/month
+const formatDateInput = (value) => {
+  // Remove everything except numbers and slashes
+  const digits = value.replace(/[^\d/]/g, "");
+  
+  // If user is deleting, return the cleaned value
+  if (digits.length < value.length) {
+    return digits;
+  }
+
+  // Extract numbers only for processing
+  const numbers = digits.replace(/\D/g, "");
+  const limited = numbers.slice(0, 8);
+  
+  let day = limited.slice(0, 2);
+  let month = limited.slice(2, 4);
+  let year = limited.slice(4, 8);
+
+  // ✅ Day limit
+  if (day && parseInt(day) > 31) day = "31";
+  if (day && parseInt(day) < 1) day = "01";
+
+  // ✅ Month limit
+  if (month && parseInt(month) > 12) month = "12";
+  if (month && parseInt(month) < 1) month = "01";
+
+  // ✅ Year validation - ONLY auto-correct when out of bounds
+  const currentYear = new Date().getFullYear();
+  const minYear = currentYear;
+  const maxYear = currentYear + 2;
+
+  if (year && year.length === 4) {
+    const parsedYear = parseInt(year);
+    
+    // Only auto-correct if year is below min OR above max
+    if (parsedYear < minYear || parsedYear > maxYear) {
+      year = String(currentYear); // Auto-set to current year only when out of bounds
+    }
+  }
+
+  // ✅ Build formatted string with persistent slashes
+  let formatted = day;
+  
+  if (limited.length > 2) {
+    formatted += "/" + month;
+  }
+  
+  if (limited.length > 4) {
+    formatted += "/" + year;
+  }
+
+  // ✅ Add trailing slashes for better UX while typing
+  if (limited.length === 2) {
+    formatted += "/";
+  } else if (limited.length === 4) {
+    formatted += "/";
+  }
+
+  return formatted;
+};
+
+
+const validateAndConvertDate = (formatted, key) => {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(formatted);
+  if (match) {
+    const [, day, month, year] = match;
+    const d = parseInt(day, 10);
+    const m = parseInt(month, 10);
+    const y = parseInt(year, 10);
+
+    if (m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+      const iso = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      setFormData((prev) => ({ ...prev, [key]: iso }));
+      return;
+    }
+  }
+  setFormData((prev) => ({ ...prev, [key]: "" }));
+};
+
+const handleBookingDateChange = (e) => {
+  const formatted = formatDateInput(e.target.value);
+  setBookingDateDisplay(formatted);
+  validateAndConvertDate(formatted, "bookingDate");
+};
+
+const handleDeliveryDateChange = (e) => {
+  const formatted = formatDateInput(e.target.value);
+  setDeliveryDateDisplay(formatted);
+  validateAndConvertDate(formatted, "deliveryDate");
+};
+
 
   // Vehicle types according to API contract
   const vehicleTypes = [
@@ -539,16 +652,14 @@ function BookTruckScreen() {
                   <div className="form-group">
                     <label className="form-label">Booking Date *</label>
                     <input
-                      type="date"
-                      name="bookingDate"
-                      className={`form-input ${
-                        errors.bookingDate ? "error" : ""
-                      }`}
-                      value={formData.bookingDate}
-                      onChange={handleChange}
-                      placeholder="Booking Date"
-                      disabled
-                    />
+    type="text"
+    name="bookingDate"
+    className={`form-input ${errors.bookingDate ? "error" : ""}`}
+    value={bookingDateDisplay}
+    onChange={handleBookingDateChange}
+    placeholder="DD/MM/YYYY"
+    disabled
+  />
                     {errors.bookingDate && (
                       <div className="form-error">{errors.bookingDate}</div>
                     )}
@@ -557,15 +668,13 @@ function BookTruckScreen() {
                   <div className="form-group">
                     <label className="form-label">Delivery Date *</label>
                     <input
-                      type="date"
-                      name="deliveryDate"
-                      className={`form-input ${
-                        errors.deliveryDate ? "error" : ""
-                      }`}
-                      value={formData.deliveryDate}
-                      onChange={handleChange}
-                      placeholder="Delivery Date"
-                    />
+    type="text"
+    name="deliveryDate"
+    className={`form-input ${errors.deliveryDate ? "error" : ""}`}
+    value={deliveryDateDisplay}
+    onChange={handleDeliveryDateChange}
+    placeholder="DD/MM/YYYY"
+  />
                     {errors.deliveryDate && (
                       <div className="form-error">{errors.deliveryDate}</div>
                     )}
