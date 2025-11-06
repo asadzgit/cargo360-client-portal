@@ -74,21 +74,27 @@ const formatDateInput = (value) => {
 
   // Extract numbers only for processing
   const numbers = digits.replace(/\D/g, "");
+  
+  // Don't auto-complete if user is still typing the first digit
+  if (numbers.length === 1) {
+    return numbers; // Just return the single digit without auto-completing
+  }
+  
   const limited = numbers.slice(0, 8);
   
   let day = limited.slice(0, 2);
   let month = limited.slice(2, 4);
   let year = limited.slice(4, 8);
 
-  // ✅ Day limit
-  if (day && parseInt(day) > 31) day = "31";
-  if (day && parseInt(day) < 1) day = "01";
+  // ✅ Day limit - only apply when user has entered 2 digits
+  if (day.length === 2 && parseInt(day) > 31) day = "31";
+  if (day.length === 2 && parseInt(day) < 1) day = "01";
 
-  // ✅ Month limit
-  if (month && parseInt(month) > 12) month = "12";
-  if (month && parseInt(month) < 1) month = "01";
+  // ✅ Month limit - only apply when user has entered 2 digits
+  if (month.length === 2 && parseInt(month) > 12) month = "12";
+  if (month.length === 2 && parseInt(month) < 1) month = "01";
 
-  // ✅ Year validation - ONLY auto-correct when out of bounds
+  // ✅ Year validation
   const currentYear = new Date().getFullYear();
   const minYear = currentYear;
   const maxYear = currentYear + 2;
@@ -96,28 +102,32 @@ const formatDateInput = (value) => {
   if (year && year.length === 4) {
     const parsedYear = parseInt(year);
     
-    // Only auto-correct if year is below min OR above max
     if (parsedYear < minYear || parsedYear > maxYear) {
-      year = String(currentYear); // Auto-set to current year only when out of bounds
+      year = String(currentYear);
     }
   }
 
-  // ✅ Build formatted string with persistent slashes
+  // ✅ Build formatted string
   let formatted = day;
   
-  if (limited.length > 2) {
-    formatted += "/" + month;
-  }
-  
-  if (limited.length > 4) {
-    formatted += "/" + year;
-  }
-
-  // ✅ Add trailing slashes for better UX while typing
-  if (limited.length === 2) {
+  // Add slash immediately when day is complete (2 digits)
+  if (day.length === 2) {
     formatted += "/";
-  } else if (limited.length === 4) {
-    formatted += "/";
+    
+    // Add the month part if available
+    if (month) {
+      formatted += month;
+    }
+    
+    // Add second slash when month is complete (2 digits)
+    if (month.length === 2) {
+      formatted += "/";
+      
+      // Add the year part if available
+      if (year) {
+        formatted += year;
+      }
+    }
   }
 
   return formatted;
@@ -146,12 +156,39 @@ const handleBookingDateChange = (e) => {
   setBookingDateDisplay(formatted);
   validateAndConvertDate(formatted, "bookingDate");
 };
+const convertFormattedToISO = (formatted) => {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(formatted);
+  if (!match) return null;
+
+  const [, day, month, year] = match;
+  return `${year}-${month}-${day}`;
+};
+
 
 const handleDeliveryDateChange = (e) => {
   const formatted = formatDateInput(e.target.value);
   setDeliveryDateDisplay(formatted);
+
+  // Convert to ISO (or empty)
   validateAndConvertDate(formatted, "deliveryDate");
+
+  // Live validation: delivery must not be less than booking
+  const deliveryISO = convertFormattedToISO(formatted);
+  if (deliveryISO && formData.bookingDate) {
+    const bDate = new Date(formData.bookingDate);
+    const dDate = new Date(deliveryISO);
+
+    if (dDate < bDate) {
+      setErrors((prev) => ({
+        ...prev,
+        deliveryDate: "Delivery date cannot be before booking date",
+      }));
+    } else {
+      setErrors((prev) => ({ ...prev, deliveryDate: "" }));
+    }
+  }
 };
+
 
 
   // Vehicle types according to API contract
@@ -504,9 +541,15 @@ const handleDeliveryDateChange = (e) => {
           : undefined,
         insurance: formData.insurance || undefined,
         salesTax: formData.salesTax || undefined,
-      };
 
-      const response = await createBooking(bookingData);
+        bookingDate: formData.bookingDate,
+        deliveryDate: formData.deliveryDate,
+
+      };
+      console.log("PAYLOAD SENT TO BACKEND:", bookingData);
+
+
+      // const response = await createBooking(bookingData);
       setShowSuccess(true);
 
       // Reset form after delay and navigate
