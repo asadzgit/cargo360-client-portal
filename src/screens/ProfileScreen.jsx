@@ -182,6 +182,12 @@ function ProfileScreen() {
                 <value>{profile.email}</value>
             </div>
 
+             {/* ✅ ADDED — SHOW COMPANY UNDER EMAIL */}
+            <div className="info-item">
+              <label>Company</label>
+              <value>{profile.company || '-'}</value>
+            </div>
+
             <div className="info-item">
                 <label>Phone</label>
                 {!isEditing ? (
