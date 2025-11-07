@@ -549,7 +549,7 @@ const handleDeliveryDateChange = (e) => {
       console.log("PAYLOAD SENT TO BACKEND:", bookingData);
 
 
-      // const response = await createBooking(bookingData);
+      const response = await createBooking(bookingData);
       setShowSuccess(true);
 
       // Reset form after delay and navigate

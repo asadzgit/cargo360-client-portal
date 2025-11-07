@@ -175,6 +175,8 @@ export const bookingAPI = {
         numberOfVehicles: bookingData.numberOfVehicles,
         insurance: bookingData.insurance,
         salesTax: bookingData.salesTax,
+        bookingDate: bookingData.bookingDate,
+        deliveryDate: bookingData.deliveryDate,
       },
     });
   },
