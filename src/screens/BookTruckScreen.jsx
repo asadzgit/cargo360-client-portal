@@ -12,7 +12,7 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { useBooking } from "../context/BookingContext";
-import LocationSelect from "../components/LocationSelect";
+import LocationSelect from "../components/LocationSelectNative";
 import { ClientFooter } from "../components/ClientFooter";
 import "./BookTruckScreen.css";
 

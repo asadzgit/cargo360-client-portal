@@ -305,3 +305,41 @@ input, select {
   color: #ccc;
   margin-top: 8px;
 }
+
+/* Google Places Autocomplete Element Styling */
+/* Style the new PlaceAutocompleteElement to match form inputs */
+gmp-place-autocomplete {
+  width: 100% !important;
+}
+
+gmp-place-autocomplete input {
+  width: 100% !important;
+  height: 44px !important;
+  padding: 0.75rem !important;
+  font-size: 16px !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  transition: border-color 0.2s ease !important;
+}
+
+gmp-place-autocomplete input:focus {
+  outline: none !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 1px #3b82f6 !important;
+}
+
+gmp-place-autocomplete input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Style error state */
+.form-group .error gmp-place-autocomplete input {
+  border-color: #ef4444 !important;
+}
+
+.form-group .error gmp-place-autocomplete input:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px #ef4444 !important;
+}
