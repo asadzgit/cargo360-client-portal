@@ -404,12 +404,18 @@ const numberToWords = (num) => {
                         <p style={{color: 'white'}}>Discount request pending</p>
                       )}
                       {booking.DiscountRequest && booking.DiscountRequest.status === 'accepted' && (
-                        <p style={{color: 'white'}}>Discount request accepted</p>
+                        <>
+                          <p style={{color: 'orange'}}>Discount request accepted</p>
+                          <p style={{color: 'orange'}}>Amount accepted: {booking.DiscountRequest?.requestAmount}</p>
+                        </>
                       )}
                       {booking.DiscountRequest && booking.DiscountRequest.status === 'rejected' && (
+                        <>
                         <p style={{color: 'red'}}>Discount request rejected</p>
+                        <p style={{color: 'red'}}>Amount rejected: {booking.DiscountRequest?.requestAmount}</p>
+                        </>
                       )}
-                      {booking.DiscountRequest && booking.DiscountRequest.status != 'rejected' && (
+                      {booking.DiscountRequest?.status != 'accepted' && booking.DiscountRequest?.status != 'rejected' && (
                         <div className='flex align-items-center gap-2'>
                           <p style={{color: 'white'}}>Want a discount? <br></br> Enter your budget (PKR)</p>
                           <input
