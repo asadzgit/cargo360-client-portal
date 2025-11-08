@@ -75,6 +75,7 @@ export const authAPI = {
         email: userData.email,
         phone: userData.phone,
         password: userData.password,
+        company: userData.company,
         role: 'customer', // Always customer for this frontend
       },
     });
