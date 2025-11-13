@@ -232,6 +232,14 @@ export const bookingAPI = {
       data: { requestAmount },
     });
   },
+
+  // Confirm a shipment
+  confirmShipment: async (id) => {
+    return apiRequest(`/shipments/${id}/confirm`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+    });
+  },
 };
 
 // Token management utilities

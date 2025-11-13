@@ -20,6 +20,9 @@ function BookingDetailScreen() {
   const [discountBudget, setDiscountBudget] = useState('');
   const [discountLoading, setDiscountLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   useEffect(() => {
     const loadBooking = async () => {
@@ -82,6 +85,35 @@ function BookingDetailScreen() {
       alert(e?.message || 'Failed to create discount request');
     } finally {
       setDiscountLoading(false);
+    }
+  };
+
+  const handleConfirmOrder = async () => {
+    if (!agreedToTerms) {
+      alert('Please agree to the terms and conditions to confirm your order.');
+      return;
+    }
+
+    try {
+      setConfirmLoading(true);
+      const res = await bookingAPI.confirmShipment(id);
+      
+      // Refresh booking to get updated status
+      try {
+        const bookingData = await fetchBooking(id);
+        setBooking(bookingData);
+      } catch {}
+      
+      // Close modal
+      setShowConfirmModal(false);
+      setAgreedToTerms(false);
+      
+      // Show success message
+      alert('Order Confirmed!\n\nYour shipment has been confirmed successfully. You will be notified shortly after a driver picks up this order.');
+    } catch (e) {
+      alert(e?.message || 'Failed to confirm order. Please try again.');
+    } finally {
+      setConfirmLoading(false);
     }
   };
 
@@ -473,6 +505,28 @@ const numberToWords = (num) => {
                         <value>In Negotiation</value>
                       </div>
                     )}
+
+                    {/* Confirm Order Button */}
+                    {booking.budget && booking.status !== 'confirmed' && booking.status !== 'completed' && booking.status !== 'cancelled' && (
+                      <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #333' }}>
+                        <button
+                          className="btn btn-primary"
+                          style={{ width: '100%', padding: '12px', fontSize: '16px' }}
+                          onClick={() => setShowConfirmModal(true)}
+                        >
+                          <FaClipboardCheck /> Confirm Order
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Show confirmation message if already confirmed */}
+                    {booking.status === 'confirmed' && (
+                      <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#10b981', borderRadius: '8px' }}>
+                        <p style={{ color: 'white', margin: 0, textAlign: 'center', fontWeight: '600' }}>
+                          ✓ Order Confirmed - Waiting for driver assignment
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -547,6 +601,103 @@ const numberToWords = (num) => {
             onClose={() => setShowEditModal(false)}
             onSuccess={handleEditSuccess}
           />
+
+          {/* Confirm Order Modal */}
+          {showConfirmModal && (
+            <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+                <div className="modal-header">
+                  <h3><FaClipboardCheck /> Confirm Your Order</h3>
+                  <button className="modal-close" onClick={() => setShowConfirmModal(false)}>
+                    <FaTimes />
+                  </button>
+                </div>
+
+                <div className="modal-body">
+                  <div style={{ backgroundColor: '#f3f4f6', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
+                    <h4 style={{ color: '#000', marginBottom: '15px' }}>Order Summary</h4>
+                    
+                    <div style={{ marginBottom: '10px' }}>
+                      <strong style={{ color: '#000' }}>Pickup:</strong>
+                      <p style={{ color: '#374151', margin: '5px 0' }}>{booking.pickupLocation}</p>
+                    </div>
+
+                    <div style={{ marginBottom: '10px' }}>
+                      <strong style={{ color: '#000' }}>Drop Off:</strong>
+                      <p style={{ color: '#374151', margin: '5px 0' }}>{booking.dropLocation}</p>
+                    </div>
+
+                    <div style={{ marginBottom: '10px' }}>
+                      <strong style={{ color: '#000' }}>Vehicle Type:</strong>
+                      <p style={{ color: '#374151', margin: '5px 0' }}>{booking.vehicleType}</p>
+                    </div>
+
+                    <div style={{ marginBottom: '10px' }}>
+                      <strong style={{ color: '#000' }}>Cargo Type:</strong>
+                      <p style={{ color: '#374151', margin: '5px 0' }}>{booking.cargoType}</p>
+                    </div>
+
+                    <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '2px solid #d1d5db' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <strong style={{ color: '#000', fontSize: '18px' }}>Total Budget:</strong>
+                        <strong style={{ color: '#01304e', fontSize: '22px' }}>
+                          PKR {booking.budget?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        </strong>
+                      </div>
+                      <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '5px' }}>
+                        {numberToWords(booking.budget)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={{ backgroundColor: '#fef3c7', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
+                    <p style={{ color: '#92400e', margin: 0, fontSize: '14px', lineHeight: '1.6' }}>
+                      <strong>Important:</strong> By confirming this order, you agree that the above details and budget are correct. 
+                      Once confirmed, a driver will be assigned to your shipment and you will be notified shortly.
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '20px' }}>
+                    <input
+                      type="checkbox"
+                      id="agreeTerms"
+                      checked={agreedToTerms}
+                      onChange={(e) => setAgreedToTerms(e.target.checked)}
+                      style={{ marginTop: '3px', cursor: 'pointer', width: '18px', height: '18px' }}
+                    />
+                    <label htmlFor="agreeTerms" style={{ color: '#000', fontSize: '14px', cursor: 'pointer', lineHeight: '1.5' }}>
+                      I confirm that all the details are correct and I agree to the terms and conditions. 
+                      I understand that once confirmed, the order cannot be cancelled without charges.
+                    </label>
+                  </div>
+                </div>
+
+                <div className="modal-footer">
+                  <button 
+                    className="btn btn-secondary" 
+                    onClick={() => {
+                      setShowConfirmModal(false);
+                      setAgreedToTerms(false);
+                    }}
+                    disabled={confirmLoading}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="btn btn-primary"
+                    onClick={handleConfirmOrder}
+                    disabled={!agreedToTerms || confirmLoading}
+                    style={{ 
+                      opacity: (!agreedToTerms || confirmLoading) ? 0.6 : 1,
+                      cursor: (!agreedToTerms || confirmLoading) ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    {confirmLoading ? 'Confirming...' : 'Confirm Order'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <ClientFooter/>
