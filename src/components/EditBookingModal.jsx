@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaTruck, FaMapMarkerAlt, FaWeight, FaClipboardList, FaCheckCircle } from 'react-icons/fa';
 import { useBooking } from '../context/BookingContext';
-import LocationSelect from './LocationSelectNative';
+import LocationSelect from './LocationSelect';
 import './EditBookingModal.css';
 
 function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
