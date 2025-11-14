@@ -22,13 +22,33 @@ function BookingStatusScreen() {
   }, []);
 
   // Format date as DD/MM/YYYY
-  const formatDate = (dateString) => {
+ // Format any date into DD/MM/YYYY (supports ISO & DD/MM/YYYY & DD/MM/YYYY hh:mm AM/PM)
+const formatDate = (dateString) => {
+  if (!dateString) return "Not set";
+
+  // If date is ISO (e.g. "2025-11-14T05:01:42.390Z")
+  if (dateString.includes("T")) {
     const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
+    if (isNaN(date.getTime())) return "Invalid date";
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
+
     return `${day}/${month}/${year}`;
-  };
+  }
+
+  // If date is "DD/MM/YYYY" or "DD/MM/YYYY hh:mm" or "DD/MM/YYYY hh:mm AM/PM"
+  const [datePart] = dateString.split(" ");
+  const parts = datePart.split("/");
+
+  if (parts.length !== 3) return "Invalid date";
+
+  const [day, month, year] = parts;
+
+  return `${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
+};
+
 
   // Filter and sort bookings
 
@@ -234,6 +254,16 @@ function BookingStatusScreen() {
   <div className="booking-info">
     <div className="info-row">
       <div className="info-item">
+        <strong>Booking Date:</strong>
+        <span>{formatDate(booking.createdAt)}</span>
+      </div>
+      <div className="info-item">
+        <strong>Delivery Date:</strong>
+        <span>{formatDate(booking.deliveryDate)}</span>
+      </div>
+    </div>
+    <div className="info-row">
+      <div className="info-item">
         <strong>Vehicle:</strong>
         <span>{humanize(booking.vehicleType)}</span>
       </div>
@@ -241,19 +271,6 @@ function BookingStatusScreen() {
         <strong>Cargo:</strong>
         <span>{humanize(booking.cargoType)}</span>
       </div>
-    </div>
-
-    <div className="info-row">
-      <div className="info-item">
-        <strong>Created:</strong>
-        <span>{formatDate(booking.createdAt)}</span>
-      </div>
-      {booking.cargoWeight && (
-        <div className="info-item">
-          <strong>Weight:</strong>
-          <span>{booking.cargoWeight} kg</span>
-        </div>
-      )}
     </div>
     {booking.Trucker && (
       <div className="info-row">
@@ -267,6 +284,14 @@ function BookingStatusScreen() {
         </div>
       </div>
     )}
+    <div className="info-row">
+      {booking.cargoWeight && (
+        <div className="info-item">
+          <strong>Weight:</strong>
+          <span>{booking.cargoWeight} kg</span>
+        </div>
+      )}
+    </div>
 
      {/* <div className="info-row">
       <div className='info-item'><strong>Insurance:</strong> <span>{booking.insurance ? "Yes" : "No"}</span></div>
