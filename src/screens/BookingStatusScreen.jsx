@@ -97,14 +97,34 @@ const formatDate = (dateString) => {
   };
 
   const handleCancelBooking = async (bookingId) => {
-    if (window.confirm('Are you sure you want to cancel this booking?')) {
-      try {
-        await cancelBooking(bookingId);
-      } catch (error) {
-        alert('Failed to cancel booking: ' + error.message);
-      }
-    }
-  };
+
+  // 1) Check Terms
+  if (!window.confirm("Please agree that you want to cancel this booking.")) {
+    return;
+  }
+
+  // 2) Confirm Final Action
+  const reallyCancel = window.confirm(
+    "Are you sure you want to cancel this booking? This action cannot be undone."
+  );
+  if (!reallyCancel) return;
+
+  try {
+    // Optional: add loading state (if required)
+    // setCancelLoading(true);
+
+    await cancelBooking(bookingId);
+
+    // Optional: Refresh bookings for updated UI
+    fetchBookings();
+
+  } catch (error) {
+    alert("Failed to cancel booking: " + (error.message || "Unknown error"));
+  } finally {
+    // Optional: setCancelLoading(false);
+  }
+};
+
 
   const statusCounts = {
     all: bookings.length,
@@ -264,18 +284,18 @@ const formatDate = (dateString) => {
     </div>
     <div className="info-row">
       <div className="info-item">
-        <strong>Vehicle:</strong>
+        <strong>Vehicle Type:</strong>
         <span>{humanize(booking.vehicleType)}</span>
       </div>
       <div className="info-item">
-        <strong>Cargo:</strong>
+        <strong>Cargo Type:</strong>
         <span>{humanize(booking.cargoType)}</span>
       </div>
     </div>
     {booking.Trucker && (
       <div className="info-row">
         <div className="info-item">
-          <strong>Trucker:</strong>
+          <strong>Broker:</strong>
           <span>{booking.Trucker.name}</span>
         </div>
         <div className="info-item">
