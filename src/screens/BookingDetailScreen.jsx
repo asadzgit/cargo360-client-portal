@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaWeight, FaClock, FaPhone, FaUser, FaRoute, FaMoneyBill, FaClipboardCheck, FaTimes, FaCar, FaEdit, FaPlus } from 'react-icons/fa';
+import { FaArrowLeft, FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaWeight, FaClock, FaPhone, FaUser, FaRoute, FaMoneyBill, FaClipboardCheck, FaTimes, FaCar, FaEdit, FaPlus, FaPrint } from 'react-icons/fa';
 import { useBooking } from '../context/BookingContext';
+import { useAuth } from '../context/AuthContext';
 import LocationTrackingModal from '../components/LocationTrackingModal';
 import EditBookingModal from '../components/EditBookingModal';
 import { humanize } from '../utils/helpers';
@@ -10,10 +11,13 @@ import {ClientFooter} from '../components/ClientFooter';
 import Modal from '../components/Modal';
 import './BookingDetailScreen.css';
 
+// const PRINTABLE_STATUSES = ['confirmed', 'picked_up', 'in_transit', 'delivered', 'completed'];
+
 function BookingDetailScreen() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { fetchBooking, cancelBooking, loading, error } = useBooking();
+  const { user } = useAuth();
   const [booking, setBooking] = useState(null);
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -27,6 +31,7 @@ function BookingDetailScreen() {
   const [selectedCancelReason, setSelectedCancelReason] = useState('');
   const [customCancelReason, setCustomCancelReason] = useState('');
   const [cancelling, setCancelling] = useState(false);
+  // const [invoiceGenerating, setInvoiceGenerating] = useState(false);
 
   useEffect(() => {
     const loadBooking = async () => {
@@ -244,6 +249,312 @@ function BookingDetailScreen() {
     return numToWords(num) + " Only";
   };
 
+  const formatDeliveryDate = (raw) => {
+    if (!raw) return 'Not set';
+
+    if (raw.includes?.('T')) {
+      const parsedISO = new Date(raw);
+      if (!Number.isNaN(parsedISO.getTime())) {
+        return parsedISO.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+      }
+    }
+
+    const [datePart, timePart] = raw.split(' ');
+    const dateSegments = datePart?.split('/') || [];
+
+    if (dateSegments.length !== 3) return 'Not set';
+
+    const [dayStr, monthStr, yearStr] = dateSegments;
+    const day = Number(dayStr);
+    const month = Number(monthStr);
+    const year = Number(yearStr);
+
+    if ([day, month, year].some(Number.isNaN)) return 'Not set';
+
+    let hours = 0;
+    let minutes = 0;
+
+    if (timePart) {
+      const [hm, ampm] = timePart.split(/(AM|PM)/i).filter(Boolean);
+      if (hm) {
+        const [hr, min] = hm.split(':').map(Number);
+        hours = Number.isNaN(hr) ? 0 : hr;
+        minutes = Number.isNaN(min) ? 0 : min;
+      }
+
+      if (ampm) {
+        const upper = ampm.toUpperCase();
+        if (upper === 'PM' && hours !== 12) hours += 12;
+        if (upper === 'AM' && hours === 12) hours = 0;
+      }
+    }
+
+    const parsed = new Date(year, month - 1, day, hours, minutes);
+    if (Number.isNaN(parsed.getTime())) return 'Not set';
+    return parsed.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  const formatDateTime = (value, withTime = true) => {
+    if (!value) return 'Not set';
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return 'Not set';
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    };
+    if (withTime) {
+      options.hour = '2-digit';
+      options.minute = '2-digit';
+    }
+    return parsed.toLocaleDateString('en-US', options);
+  };
+
+  const formatCurrency = (value) => {
+    if (!value && value !== 0) return 'PKR 0';
+    const numeric = Number(value);
+    if (Number.isNaN(numeric)) return `PKR ${value}`;
+    return `PKR ${numeric.toLocaleString('en-US')}`;
+  };
+
+  const getCustomerField = (bookingField, fallbackUserField, defaultText = '—') => {
+    return bookingField || fallbackUserField || defaultText;
+  };
+
+  //code to print invoive
+  // const generateInvoiceHTML = (currentBooking) => {
+  //   const now = new Date();
+  //   const invoiceId = `INV-${currentBooking.id}-${now.getTime()}`;
+  //   const invoiceDate = now.toLocaleString('en-US', {
+  //     year: 'numeric',
+  //     month: 'short',
+  //     day: 'numeric',
+  //     hour: '2-digit',
+  //     minute: '2-digit',
+  //   });
+  //   const bookingDate = formatDateTime(currentBooking.createdAt, false);
+  //   const deliveryDate = formatDeliveryDate(currentBooking.deliveryDate);
+  //   const customerName = getCustomerField(currentBooking?.Customer?.name, user?.name, 'Valued Customer');
+  //   const customerCompany = getCustomerField(currentBooking?.Customer?.company, user?.company);
+  //   const customerEmail = getCustomerField(currentBooking?.Customer?.email, user?.email);
+  //   const customerPhone = getCustomerField(currentBooking?.Customer?.phone, user?.phone);
+  //   const driverName = currentBooking?.Trucker?.name || 'Pending Assignment';
+  //   const driverPhone = currentBooking?.Trucker?.phone || 'Pending Assignment';
+  //   const amountNumeric = Number(currentBooking?.budget) || 0;
+  //   const amountWords = numberToWords(amountNumeric);
+
+  //   return `
+  //     <!DOCTYPE html>
+  //     <html>
+  //       <head>
+  //         <title>Invoice ${invoiceId}</title>
+  //         <style>
+  //           body {
+  //             font-family: 'Segoe UI', Arial, sans-serif;
+  //             margin: 0;
+  //             padding: 24px;
+  //             color: #111827;
+  //             background: #f3f4f6;
+  //           }
+  //           .invoice-container {
+  //             max-width: 820px;
+  //             margin: 0 auto;
+  //             background: #ffffff;
+  //             border-radius: 12px;
+  //             padding: 32px;
+  //             box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+  //           }
+  //           .invoice-header {
+  //             display: flex;
+  //             justify-content: space-between;
+  //             align-items: flex-start;
+  //             border-bottom: 2px solid #e5e7eb;
+  //             padding-bottom: 24px;
+  //             margin-bottom: 24px;
+  //           }
+  //           .invoice-title {
+  //             font-size: 28px;
+  //             margin: 0;
+  //             color: #111827;
+  //           }
+  //           .invoice-meta {
+  //             text-align: right;
+  //             font-size: 14px;
+  //             color: #6b7280;
+  //           }
+  //           .section-title {
+  //             font-size: 16px;
+  //             font-weight: 600;
+  //             margin-bottom: 8px;
+  //             color: #111827;
+  //           }
+  //           .info-grid {
+  //             display: grid;
+  //             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  //             gap: 16px;
+  //             margin-bottom: 24px;
+  //           }
+  //           .info-card {
+  //             background: #f9fafb;
+  //             border-radius: 10px;
+  //             padding: 16px;
+  //             border: 1px solid #e5e7eb;
+  //           }
+  //           .info-card label {
+  //             display: block;
+  //             font-size: 12px;
+  //             text-transform: uppercase;
+  //             letter-spacing: 0.05em;
+  //             color: #6b7280;
+  //             margin-bottom: 4px;
+  //           }
+  //           .info-card span {
+  //             font-size: 15px;
+  //             font-weight: 600;
+  //             color: #111827;
+  //           }
+  //           table {
+  //             width: 100%;
+  //             border-collapse: collapse;
+  //             margin-top: 8px;
+  //             margin-bottom: 16px;
+  //           }
+  //           th, td {
+  //             padding: 12px 16px;
+  //             border: 1px solid #e5e7eb;
+  //             text-align: left;
+  //           }
+  //           th {
+  //             background: #f3f4f6;
+  //             font-size: 14px;
+  //             letter-spacing: 0.03em;
+  //             text-transform: uppercase;
+  //             color: #6b7280;
+  //           }
+  //           tfoot td {
+  //             font-size: 18px;
+  //             font-weight: 700;
+  //             background: #111827;
+  //             color: #ffffff;
+  //           }
+  //           .footer-note {
+  //             margin-top: 32px;
+  //             font-size: 13px;
+  //             color: #6b7280;
+  //           }
+  //           .amount-words {
+  //             font-style: italic;
+  //             margin-top: 4px;
+  //             color: #374151;
+  //           }
+  //         </style>
+  //       </head>
+  //       <body>
+  //         <div class="invoice-container">
+  //           <div class="invoice-header">
+  //             <div>
+  //               <h1 class="invoice-title">Cargo360 Shipment Invoice</h1>
+  //               <p style="margin: 4px 0 0; color: #4b5563;">Booking ID: C360-PK-${currentBooking.id}</p>
+  //             </div>
+  //             <div class="invoice-meta">
+  //               <div><strong>Invoice #:</strong> ${invoiceId}</div>
+  //               <div><strong>Date:</strong> ${invoiceDate}</div>
+  //             </div>
+  //           </div>
+
+  //           <div class="info-grid">
+  //             <div class="info-card">
+  //               <label>Billed To</label>
+  //               <span>${customerName}</span><br/>
+  //               <span>${customerCompany}</span><br/>
+  //               <span>${customerEmail}</span><br/>
+  //               <span>${customerPhone}</span>
+  //             </div>
+  //             <div class="info-card">
+  //               <label>Shipment Summary</label>
+  //               <span>Route: ${currentBooking.pickupLocation} → ${currentBooking.dropLocation}</span><br/>
+  //               <span>Vehicle: ${humanize(currentBooking.vehicleType)}</span><br/>
+  //               <span>Cargo: ${humanize(currentBooking.cargoType)}</span><br/>
+  //               <span>Weight: ${currentBooking.cargoWeight || 'N/A'} kg</span>
+  //             </div>
+  //             <div class="info-card">
+  //               <label>Important Dates</label>
+  //               <span>Booked: ${bookingDate}</span><br/>
+  //               <span>Delivery: ${deliveryDate}</span><br/>
+  //               <span>Status: ${humanize(currentBooking.status)}</span>
+  //             </div>
+  //           </div>
+
+  //           <h3 class="section-title">Service Details</h3>
+  //           <table>
+  //             <thead>
+  //               <tr>
+  //                 <th>Description</th>
+  //                 <th>Broker</th>
+  //                 <th>Driver Contact</th>
+  //                 <th>Amount</th>
+  //               </tr>
+  //             </thead>
+  //             <tbody>
+  //               <tr>
+  //                 <td>${humanize(currentBooking.vehicleType)} (${humanize(currentBooking.cargoType)})</td>
+  //                 <td>${driverName}</td>
+  //                 <td>${driverPhone}</td>
+  //                 <td>${formatCurrency(amountNumeric)}</td>
+  //               </tr>
+  //             </tbody>
+  //             <tfoot>
+  //               <tr>
+  //                 <td colspan="3">Grand Total</td>
+  //                 <td>${formatCurrency(amountNumeric)}</td>
+  //               </tr>
+  //             </tfoot>
+  //           </table>
+  //           <div class="amount-words"><strong>Amount in words:</strong> ${amountWords}</div>
+
+  //           <p class="footer-note">
+  //             This invoice is generated for your confirmed Cargo360 shipment. Please retain a copy for your records.
+  //             For any questions, contact support@cargo360.com.
+  //           </p>
+  //         </div>
+  //       </body>
+  //     </html>
+  //   `;
+  // };
+
+  // const handlePrintInvoice = () => {
+  //   if (!booking) return;
+  //   if (typeof window === 'undefined') return;
+  //   try {
+  //     setInvoiceGenerating(true);
+  //     const invoiceWindow = window.open('', '_blank', 'width=900,height=700');
+  //     if (!invoiceWindow) {
+  //       alert('Please allow pop-ups to print the invoice.');
+  //       return;
+  //     }
+  //     invoiceWindow.document.write(generateInvoiceHTML(booking));
+  //     invoiceWindow.document.close();
+  //     invoiceWindow.focus();
+  //     invoiceWindow.print();
+  //     setTimeout(() => {
+  //       invoiceWindow.close();
+  //     }, 200);
+  //   } finally {
+  //     setInvoiceGenerating(false);
+  //   }
+  // };
+
+  // const normalizedStatus = booking.status?.toLowerCase() || '';
+  // const canPrintInvoice = Boolean(booking.budget) && PRINTABLE_STATUSES.includes(normalizedStatus);
+
   return (
     <>
       <div className="booking-detail-screen">
@@ -293,7 +604,7 @@ function BookingDetailScreen() {
                     {(booking?.Trucker || booking?.trucker) && (
                       <>
                         <div className="info-item">
-                          <label>Trucker</label>
+                          <label>Broker</label>
                           <value>{booking?.Trucker?.name || booking?.trucker?.name}</value>
                         </div>
                         <div className="info-item">
@@ -361,71 +672,16 @@ function BookingDetailScreen() {
                   <div className="info-grid">
                     <div className="info-item">
                       <label>Booking Created</label>
-                      <value>{new Date(booking.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}</value>
+                      <value>{formatDateTime(booking.createdAt)}</value>
                     </div>
                     <div className="info-item">
                       <label>Delivery Date</label>
-                      <value>
-  {(() => {
-    const raw = booking.deliveryDate;
-    if (!raw) return "Not set";
-
-    // Example raw: "15/11/2025" or "15/11/2025 08:45 PM"
-    const [datePart, timePart] = raw.split(" ");
-
-    // Parse DD/MM/YYYY
-    const dateParts = datePart.split("/");
-    if (dateParts.length !== 3) return "Not set";
-
-    const [day, month, year] = dateParts.map(Number);
-
-    let hours = 0;
-    let minutes = 0;
-
-    if (timePart) {
-      // If time exists (supports "08:45", "08:45 PM", "20:45")
-      let [hm, ampm] = timePart.split(/(AM|PM)/i).filter(Boolean);
-
-      let [h, m] = hm.split(":").map(Number);
-      hours = h;
-      minutes = m;
-
-      // Convert to 24h if AM/PM exists
-      if (ampm) {
-        const upper = ampm.toUpperCase();
-        if (upper === "PM" && hours !== 12) hours += 12;
-        if (upper === "AM" && hours === 12) hours = 0;
-      }
-    }
-
-    const parsed = new Date(year, month - 1, day, hours, minutes);
-
-    if (isNaN(parsed.getTime())) return "Not set";
-
-    return parsed.toLocaleString("en-US", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    });
-  })()}
-</value>
+                      <value>{formatDeliveryDate(booking.deliveryDate)}</value>
 
                       </div>
                     <div className="info-item">
                       <label>Last Updated</label>
-                      <value>{new Date(booking.updatedAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}</value>
+                      <value>{formatDateTime(booking.updatedAt)}</value>
                     </div>
                   </div>
                 </div>
@@ -588,6 +844,16 @@ function BookingDetailScreen() {
                 <FaCar /> See Driver Location
               </button>
             )}
+
+            {/* {canPrintInvoice && (
+              <button
+                className="btn btn-secondary"
+                onClick={handlePrintInvoice}
+                disabled={invoiceGenerating}
+              >
+                <FaPrint /> {invoiceGenerating ? 'Preparing Invoice...' : 'Print Invoice'}
+              </button>
+            )} */}
             
             <button 
               className="btn btn-primary"

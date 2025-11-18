@@ -317,11 +317,11 @@ const formatDate = (dateString) => {
     </div>
     <div className="info-row">
       <div className="info-item">
-        <strong>Vehicle:</strong>
+        <strong>Vehicle Type:</strong>
         <span>{humanize(booking.vehicleType)}</span>
       </div>
       <div className="info-item">
-        <strong>Cargo:</strong>
+        <strong>Cargo Type:</strong>
         <span>{humanize(booking.cargoType)}</span>
       </div>
     </div>
@@ -329,7 +329,7 @@ const formatDate = (dateString) => {
     {(booking?.Trucker || booking?.trucker) && (
       <div className="info-row">
         <div className="info-item">
-          <strong>Trucker:</strong>
+          <strong>Broker:</strong>
           <span>{booking?.Trucker?.name || booking?.trucker?.name}</span>
         </div>
         <div className="info-item">
