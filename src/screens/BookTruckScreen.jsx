@@ -866,7 +866,7 @@ const handleDeliveryDateChange = (e) => {
 
                 <div className="checkbox-group">
                   {/* Insurance Checkbox */}
-                  <label className="checkbox-label">
+                  {/*<label className="checkbox-label">
                     <input
                       // style={{appearance:'none',}}
                       type="checkbox"
@@ -880,7 +880,7 @@ const handleDeliveryDateChange = (e) => {
                       }
                     />
                     Insurance
-                  </label>
+                  </label>*/}
 
                   {/* Sales Tax Invoice Checkbox */}
                   <label className="checkbox-label">

@@ -18,6 +18,7 @@ function ProfileScreen() {
   // Edit profile form
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
+  const [editCompany, setEditCompany] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [updateLoading, setUpdateLoading] = useState(false);
   const [updateError, setUpdateError] = useState('');
@@ -40,6 +41,7 @@ function ProfileScreen() {
         const u = data?.user ?? data;
         setProfile(u);
         setEditName(u?.name || '');
+        setEditCompany(u?.company || '');
         setEditPhone(u?.phone || '');
       } catch (e) {
         setFetchError(e?.message || 'Failed to load profile');
@@ -55,12 +57,14 @@ function ProfileScreen() {
     setUpdateSuccess('');
     setIsEditing(true);
     setEditName(profile?.name || '');
+    setEditCompany(profile?.company || '');
     setEditPhone(profile?.phone || '');
   };
 
   const cancelEdit = () => {
     setIsEditing(false);
     setEditName(profile?.name || '');
+    setEditCompany(profile?.company || '');
     setEditPhone(profile?.phone || '');
     setUpdateError('');
     setUpdateSuccess('');
@@ -71,6 +75,7 @@ function ProfileScreen() {
     setUpdateSuccess('');
     const payload = {};
     if (editName !== profile?.name) payload.name = editName.trim();
+    if (editCompany !== profile?.company) payload.company = editCompany.trim();
     if (editPhone !== profile?.phone) payload.phone = editPhone.trim();
     if (Object.keys(payload).length === 0) {
       setUpdateError('No changes to update.');
@@ -184,9 +189,19 @@ function ProfileScreen() {
 
              {/* ✅ ADDED — SHOW COMPANY UNDER EMAIL */}
             <div className="info-item">
-              <label>Company</label>
-              <value>{profile.company || '-'}</value>
-            </div>
+  <label>Company</label>
+  {!isEditing ? (
+    <value>{profile.company || '-'}</value>
+  ) : (
+    <input
+      className="form-input"
+      value={editCompany}
+      onChange={(e) => setEditCompany(e.target.value)}
+      placeholder="Your company"
+    />
+  )}
+</div>
+
 
             <div className="info-item">
                 <label>Phone</label>
