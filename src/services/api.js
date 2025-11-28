@@ -176,6 +176,7 @@ export const bookingAPI = {
         numberOfVehicles: bookingData.numberOfVehicles,
         insurance: bookingData.insurance,
         salesTax: bookingData.salesTax,
+        clearingAgentNum: bookingData.clearingAgentNum,
         bookingDate: bookingData.bookingDate,
         deliveryDate: bookingData.deliveryDate,
       },
@@ -209,10 +210,12 @@ export const bookingAPI = {
   },
 
   // Cancel booking
-  cancelBooking: async (id) => {
+  cancelBooking: async (id, reason = null) => {
+    const payload = reason ? { cancelReason: reason } : {};
     return apiRequest(`/shipments/${id}/cancel`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
+      data: payload,
     });
   },
 
