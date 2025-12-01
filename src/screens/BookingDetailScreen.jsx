@@ -483,23 +483,39 @@ const numberToWords = (num) => {
                   <div className="pricing-breakdown">
                   {booking.budget && (
                     <>
+                      {/* Admin Budget - Always show original budget */}
+                      <div className="price-item">
+                        <label>Admin Budget</label>
+                        <value>PKR {parseFloat(booking.budget).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</value>
+                      </div>
+
+                      {/* Discount Request Section */}
                       {booking.DiscountRequest && booking.DiscountRequest.status === 'pending' && (
-                        <p style={{color: 'white'}}>Discount request pending</p>
+                        <div className="price-item" style={{color: '#fbbf24'}}>
+                          <label>Your Requested Budget</label>
+                          <value>PKR {parseFloat(booking.DiscountRequest.requestAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (Pending)</value>
+                        </div>
                       )}
+                      
                       {booking.DiscountRequest && booking.DiscountRequest.status === 'accepted' && (
-                        <>
-                          <p style={{color: 'orange'}}>Discount request accepted</p>
-                          <p style={{color: 'orange'}}>Amount accepted: {booking.DiscountRequest?.requestAmount}</p>
-                        </>
+                        <div className="price-item" style={{color: '#10b981'}}>
+                          <label>Discount You Get</label>
+                          <value>PKR {(
+                            parseFloat(booking.budget) - parseFloat(booking.DiscountRequest.requestAmount)
+                          ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</value>
+                        </div>
                       )}
+                      
                       {booking.DiscountRequest && booking.DiscountRequest.status === 'rejected' && (
-                        <>
-                        <p style={{color: 'red'}}>Discount request rejected</p>
-                        <p style={{color: 'red'}}>Amount rejected: {booking.DiscountRequest?.requestAmount}</p>
-                        </>
+                        <div className="price-item" style={{color: '#ef4444'}}>
+                          <label>Discount Request</label>
+                          <value>PKR {parseFloat(booking.DiscountRequest.requestAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (Rejected)</value>
+                        </div>
                       )}
-                      {booking.DiscountRequest?.status != 'accepted' && booking.DiscountRequest?.status != 'rejected' && (
-                        <div className='flex align-items-center gap-2'>
+
+                      {/* Discount Request Input - Only show if no request exists or request was rejected */}
+                      {(!booking.DiscountRequest || booking.DiscountRequest.status === 'rejected') && (
+                        <div className='flex align-items-center gap-2' style={{marginTop: '15px', marginBottom: '15px'}}>
                           <p style={{color: 'white'}}>Want a discount? <br></br> Enter your budget (PKR)</p>
                           <input
                             className='form-input' 
@@ -522,33 +538,31 @@ const numberToWords = (num) => {
                           </button>
                         </div>
                       )}
+
+                      {/* Total Budget - Show totalAmount if discount accepted, otherwise show original budget */}
+                      <div className="price-item total" style={{marginTop: '15px', paddingTop: '15px', borderTop: '1px solid #333'}}>
+                        <label>Total Budget</label>
+                        <value>PKR {booking.totalAmount 
+                          ? parseFloat(booking.totalAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                          : parseFloat(booking.budget).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                        }</value>
+                      </div>
+                      
+                      {/* Amount in words */}
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginTop: '10px',
+                        color: 'var(--accent-color)',
+                        fontWeight: 600,
+                        fontSize: '15px'
+                      }}>
+                        <span>Amount in words</span>
+                        <span>{numberToWords(booking.totalAmount ? parseFloat(booking.totalAmount) : parseFloat(booking.budget))}</span>
+                      </div>
                     </>
                   )}
-
-                    {booking.budget && (
-  <>
-    <p style={{color: 'white'}}>Best price after discussion with several brokers</p>
-    <div className="price-item total">
-      <label>Budget</label>
-      <value>PKR {booking.budget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</value>
-    </div>
-    <div style={{
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginTop: '-2px',
-  color: 'var(--accent-color)',
-  fontWeight: 600,
-  fontSize: '15px'
-}}>
-  <span>Amount in words</span>
-  <span>{numberToWords(booking.budget)}</span>
-  {/* <span>{numberToWords(750000)}</span>   Try changing this number */}
-
-</div>
-
-  </>
-)}
 
                     {!booking.budget && (
                       <div className="price-item">
@@ -779,11 +793,14 @@ const numberToWords = (num) => {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <strong style={{ color: '#000', fontSize: '18px' }}>Total Budget:</strong>
                         <strong style={{ color: '#01304e', fontSize: '22px' }}>
-                          PKR {booking.budget?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                          PKR {booking.totalAmount 
+                            ? parseFloat(booking.totalAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                            : parseFloat(booking.budget).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                          }
                         </strong>
                       </div>
                       <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '5px' }}>
-                        {numberToWords(booking.budget)}
+                        {numberToWords(booking.totalAmount ? parseFloat(booking.totalAmount) : parseFloat(booking.budget))}
                       </p>
                     </div>
                   </div>
