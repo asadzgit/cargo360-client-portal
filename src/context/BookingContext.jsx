@@ -90,11 +90,11 @@ export function BookingProvider({ children }) {
   };
 
   // Cancel a booking
-  const cancelBooking = async (id) => {
+  const cancelBooking = async (id, reason = null) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await bookingAPI.cancelBooking(id);
+      const response = await bookingAPI.cancelBooking(id, reason);
       
       // Update the booking status in the list
       setBookings(prev => 

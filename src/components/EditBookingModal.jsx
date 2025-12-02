@@ -17,7 +17,8 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
     budget: '',
     customVehicleType: '',
     insurance: false,   
-    salesTax: false 
+    salesTax: false,
+    clearingAgentNum: ''
   });
   const [errors, setErrors] = useState({});
   const [showSuccess, setShowSuccess] = useState(false);
@@ -82,7 +83,10 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
         description: booking.description || '',
         budget: booking.budget || '',
         customVehicleType: isCustomVehicle ? booking.vehicleType : '',
-        numContainers: booking.numContainers !== undefined && booking.numContainers !== null ? booking.numContainers : ''
+        numContainers: booking.numContainers !== undefined && booking.numContainers !== null ? booking.numContainers : '',
+        insurance: booking.insurance || false,
+        salesTax: booking.salesTax || false,
+        clearingAgentNum: booking.clearingAgentNum || ''
       });
       setErrors({});
       setShowSuccess(false);
@@ -108,6 +112,31 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
     }
   }
 
+    // ✅ Special validation for clearingAgentNum - only digits, max 11
+    if (name === "clearingAgentNum") {
+      // Remove any non-digit characters
+      const digitsOnly = value.replace(/\D/g, "");
+      // Limit to 11 digits
+      const limitedValue = digitsOnly.slice(0, 11);
+      
+      // Validate length if user has entered something
+      if (limitedValue && limitedValue.length !== 11) {
+        setErrors(prev => ({
+          ...prev,
+          clearingAgentNum: "Clearing agent number must be exactly 11 digits"
+        }));
+      } else if (limitedValue && limitedValue.length === 11) {
+        setErrors(prev => ({ ...prev, clearingAgentNum: "" }));
+      } else {
+        setErrors(prev => ({ ...prev, clearingAgentNum: "" }));
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        [name]: limitedValue,
+      }));
+      return;
+    }
 
     setFormData(prev => ({
       ...prev,
@@ -183,6 +212,14 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
     } else if (parseInt(formData.numContainers) > 100) {
       newErrors.numContainers = 'Number cannot exceed 100';
     }
+
+    // ✅ Clearing Agent Number validation - must be exactly 11 digits if provided
+    if (formData.clearingAgentNum) {
+      const digitsOnly = formData.clearingAgentNum.replace(/\D/g, "");
+      if (digitsOnly.length !== 11) {
+        newErrors.clearingAgentNum = "Clearing agent number must be exactly 11 digits";
+      }
+    }
     
     return newErrors;
   };
@@ -208,7 +245,10 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
         budget: formData.budget ? parseFloat(formData.budget) : undefined,
         numContainers: formData.numContainers ? parseInt(formData.numContainers, 10) : undefined,
         insurance: formData.insurance, 
-        salesTax: formData.salesTax 
+        salesTax: formData.salesTax,
+        clearingAgentNum: formData.clearingAgentNum && formData.clearingAgentNum.trim() 
+          ? formData.clearingAgentNum.trim() 
+          : undefined
       };
 
       await updateBooking(booking.id, updateData);
@@ -445,6 +485,27 @@ function EditBookingModal({ booking, isOpen, onClose, onSuccess }) {
       />
       Sales Tax Invoice
     </label>
+  </div>
+
+  {/* Clearing Agent Number Field */}
+  <div className="form-group">
+    <label className="form-label">Clearing Agent Number</label>
+    <input
+      type="text"
+      name="clearingAgentNum"
+      className={`form-input ${
+        errors.clearingAgentNum ? "error" : ""
+      }`}
+      value={formData.clearingAgentNum}
+      onChange={handleChange}
+      placeholder="Enter 11-digit clearing agent number"
+      maxLength={11}
+      inputMode="numeric"
+      pattern="[0-9]{11}"
+    />
+    {errors.clearingAgentNum && (
+      <div className="form-error">{errors.clearingAgentNum}</div>
+    )}
   </div>
 </div>
 

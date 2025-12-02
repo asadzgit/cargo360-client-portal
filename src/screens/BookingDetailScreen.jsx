@@ -23,6 +23,10 @@ function BookingDetailScreen() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [showCancelReasonModal, setShowCancelReasonModal] = useState(false);
+  const [selectedCancelReason, setSelectedCancelReason] = useState('');
+  const [customCancelReason, setCustomCancelReason] = useState('');
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     const loadBooking = async () => {
@@ -48,14 +52,57 @@ function BookingDetailScreen() {
     }
   };
 
-  const handleCancelBooking = async () => {
-    if (window.confirm('Are you sure you want to cancel this booking?')) {
-      try {
-        await cancelBooking(id);
-        navigate('/bookings');
-      } catch (error) {
-        alert('Failed to cancel booking: ' + error.message);
-      }
+  const handleCancelBooking = () => {
+    const statusKey = (booking?.status || '').toLowerCase();
+    if (['delivered', 'completed', 'cancelled'].includes(statusKey)) {
+      alert('This booking cannot be cancelled.');
+      return;
+    }
+    // Open cancel reason modal
+    setShowCancelReasonModal(true);
+    setSelectedCancelReason('');
+    setCustomCancelReason('');
+  };
+
+  const handleCloseCancelReasonModal = () => {
+    setShowCancelReasonModal(false);
+    setSelectedCancelReason('');
+    setCustomCancelReason('');
+  };
+
+  const handleSubmitCancelReason = async () => {
+    // Validate that a reason is selected or custom reason is entered
+    if (!selectedCancelReason) {
+      alert('Please select a cancellation reason.');
+      return;
+    }
+
+    if (selectedCancelReason === 'Others' && !customCancelReason.trim()) {
+      alert('Please enter your cancellation reason.');
+      return;
+    }
+
+    try {
+      setCancelling(true);
+      
+      // Prepare cancel reason
+      const cancelReason = selectedCancelReason === 'Others' 
+        ? customCancelReason.trim() 
+        : selectedCancelReason;
+      
+      // Close modal
+      setShowCancelReasonModal(false);
+      
+      // Call cancelBooking with reason
+      await cancelBooking(id, cancelReason);
+      
+      // Navigate back to bookings
+      navigate('/bookings');
+    } catch (error) {
+      alert(error?.message || 'Failed to cancel booking. Please try again.');
+      setShowCancelReasonModal(true); // Reopen modal on error
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -282,6 +329,10 @@ const numberToWords = (num) => {
                         <label>Sales Tax Invoice:</label> 
                         <value>{booking.salesTax ? "Yes" : "No"}</value>
                       </div>
+                      <div className='info-item'>
+                        <label>Clearing Agent Number:</label> 
+                        <value>{booking.clearingAgentNum || "Not provided"}</value>
+                      </div>
                   </div>
                 </div>
               </div>
@@ -432,23 +483,39 @@ const numberToWords = (num) => {
                   <div className="pricing-breakdown">
                   {booking.budget && (
                     <>
+                      {/* Admin Budget - Always show original budget */}
+                      <div className="price-item">
+                        <label>Admin Budget</label>
+                        <value>PKR {parseFloat(booking.budget).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</value>
+                      </div>
+
+                      {/* Discount Request Section */}
                       {booking.DiscountRequest && booking.DiscountRequest.status === 'pending' && (
-                        <p style={{color: 'white'}}>Discount request pending</p>
+                        <div className="price-item" style={{color: '#fbbf24'}}>
+                          <label>Your Requested Budget</label>
+                          <value>PKR {parseFloat(booking.DiscountRequest.requestAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (Pending)</value>
+                        </div>
                       )}
+                      
                       {booking.DiscountRequest && booking.DiscountRequest.status === 'accepted' && (
-                        <>
-                          <p style={{color: 'orange'}}>Discount request accepted</p>
-                          <p style={{color: 'orange'}}>Amount accepted: {booking.DiscountRequest?.requestAmount}</p>
-                        </>
+                        <div className="price-item" style={{color: '#10b981'}}>
+                          <label>Discount You Get</label>
+                          <value>PKR {(
+                            parseFloat(booking.budget) - parseFloat(booking.DiscountRequest.requestAmount)
+                          ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</value>
+                        </div>
                       )}
+                      
                       {booking.DiscountRequest && booking.DiscountRequest.status === 'rejected' && (
-                        <>
-                        <p style={{color: 'red'}}>Discount request rejected</p>
-                        <p style={{color: 'red'}}>Amount rejected: {booking.DiscountRequest?.requestAmount}</p>
-                        </>
+                        <div className="price-item" style={{color: '#ef4444'}}>
+                          <label>Discount Request</label>
+                          <value>PKR {parseFloat(booking.DiscountRequest.requestAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (Rejected)</value>
+                        </div>
                       )}
-                      {booking.DiscountRequest?.status != 'accepted' && booking.DiscountRequest?.status != 'rejected' && (
-                        <div className='flex align-items-center gap-2'>
+
+                      {/* Discount Request Input - Only show if no request exists or request was rejected */}
+                      {(!booking.DiscountRequest || booking.DiscountRequest.status === 'rejected') && (
+                        <div className='flex align-items-center gap-2' style={{marginTop: '15px', marginBottom: '15px'}}>
                           <p style={{color: 'white'}}>Want a discount? <br></br> Enter your budget (PKR)</p>
                           <input
                             className='form-input' 
@@ -471,33 +538,31 @@ const numberToWords = (num) => {
                           </button>
                         </div>
                       )}
+
+                      {/* Total Budget - Show totalAmount if discount accepted, otherwise show original budget */}
+                      <div className="price-item total" style={{marginTop: '15px', paddingTop: '15px', borderTop: '1px solid #333'}}>
+                        <label>Total Budget</label>
+                        <value>PKR {booking.totalAmount 
+                          ? parseFloat(booking.totalAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                          : parseFloat(booking.budget).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                        }</value>
+                      </div>
+                      
+                      {/* Amount in words */}
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginTop: '10px',
+                        color: 'var(--accent-color)',
+                        fontWeight: 600,
+                        fontSize: '15px'
+                      }}>
+                        <span>Amount in words</span>
+                        <span>{numberToWords(booking.totalAmount ? parseFloat(booking.totalAmount) : parseFloat(booking.budget))}</span>
+                      </div>
                     </>
                   )}
-
-                    {booking.budget && (
-  <>
-    <p style={{color: 'white'}}>Best price after discussion with several brokers</p>
-    <div className="price-item total">
-      <label>Budget</label>
-      <value>PKR {booking.budget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</value>
-    </div>
-    <div style={{
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginTop: '-2px',
-  color: 'var(--accent-color)',
-  fontWeight: 600,
-  fontSize: '15px'
-}}>
-  <span>Amount in words</span>
-  <span>{numberToWords(booking.budget)}</span>
-  {/* <span>{numberToWords(750000)}</span>   Try changing this number */}
-
-</div>
-
-  </>
-)}
 
                     {!booking.budget && (
                       <div className="price-item">
@@ -602,6 +667,93 @@ const numberToWords = (num) => {
             onSuccess={handleEditSuccess}
           />
 
+          {/* Cancel Reason Modal */}
+          {showCancelReasonModal && (
+            <div className="modal-overlay" onClick={handleCloseCancelReasonModal}>
+              <div className="modal-content cancel-reason-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+                <div className="modal-header cancel-reason-modal-header">
+                  <h3><FaTimes /> Cancel Booking</h3>
+                  <button className="modal-close" onClick={handleCloseCancelReasonModal}>
+                    <FaTimes />
+                  </button>
+                </div>
+
+                <div className="modal-body">
+                  <h4 className="cancel-reason-title">Why are you cancelling this booking?</h4>
+                  <p className="cancel-reason-subtitle">Please select a reason for cancellation *</p>
+
+                  {/* Cancel Reason Options */}
+                  <div className="cancel-reason-options">
+                    <button
+                      className={`cancel-reason-option ${selectedCancelReason === 'Not satisfied with the rates' ? 'selected' : ''}`}
+                      onClick={() => {
+                        setSelectedCancelReason('Not satisfied with the rates');
+                        setCustomCancelReason('');
+                      }}
+                    >
+                      Not satisfied with the rates
+                    </button>
+
+                    <button
+                      className={`cancel-reason-option ${selectedCancelReason === "Don't need Booking anymore" ? 'selected' : ''}`}
+                      onClick={() => {
+                        setSelectedCancelReason("Don't need Booking anymore");
+                        setCustomCancelReason('');
+                      }}
+                    >
+                      Don't need Booking anymore
+                    </button>
+
+                    <button
+                      className={`cancel-reason-option ${selectedCancelReason === 'Others' ? 'selected' : ''}`}
+                      onClick={() => {
+                        setSelectedCancelReason('Others');
+                      }}
+                    >
+                      Others
+                    </button>
+                  </div>
+
+                  {/* Custom Reason Input - Show when "Others" is selected */}
+                  {selectedCancelReason === 'Others' && (
+                    <div className="custom-reason-container">
+                      <label className="custom-reason-label">Please specify your reason *</label>
+                      <textarea
+                        className="custom-reason-input"
+                        placeholder="Enter your cancellation reason"
+                        rows={4}
+                        value={customCancelReason}
+                        onChange={(e) => setCustomCancelReason(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="cancel-reason-modal-actions">
+                    <button
+                      className="btn btn-secondary"
+                      onClick={handleCloseCancelReasonModal}
+                      disabled={cancelling}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleSubmitCancelReason}
+                      disabled={cancelling}
+                      style={{
+                        opacity: cancelling ? 0.6 : 1,
+                        cursor: cancelling ? 'not-allowed' : 'pointer'
+                      }}
+                    >
+                      {cancelling ? 'Cancelling...' : 'Confirm'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Confirm Order Modal */}
           {showConfirmModal && (
             <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
@@ -641,11 +793,14 @@ const numberToWords = (num) => {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <strong style={{ color: '#000', fontSize: '18px' }}>Total Budget:</strong>
                         <strong style={{ color: '#01304e', fontSize: '22px' }}>
-                          PKR {booking.budget?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                          PKR {booking.totalAmount 
+                            ? parseFloat(booking.totalAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                            : parseFloat(booking.budget).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                          }
                         </strong>
                       </div>
                       <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '5px' }}>
-                        {numberToWords(booking.budget)}
+                        {numberToWords(booking.totalAmount ? parseFloat(booking.totalAmount) : parseFloat(booking.budget))}
                       </p>
                     </div>
                   </div>

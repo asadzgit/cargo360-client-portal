@@ -11,6 +11,11 @@ function BookingStatusScreen() {
   const { bookings, loading, error, fetchBookings, cancelBooking } = useBooking();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+  const [showCancelReasonModal, setShowCancelReasonModal] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
+  const [selectedCancelReason, setSelectedCancelReason] = useState('');
+  const [customCancelReason, setCustomCancelReason] = useState('');
+  const [cancelling, setCancelling] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
   const statusFromUrl = urlParams.get('status');
@@ -76,13 +81,61 @@ function BookingStatusScreen() {
     }
   };
 
-  const handleCancelBooking = async (bookingId) => {
-    if (window.confirm('Are you sure you want to cancel this booking?')) {
-      try {
-        await cancelBooking(bookingId);
-      } catch (error) {
-        alert('Failed to cancel booking: ' + error.message);
-      }
+  const handleCancelBooking = (bookingId) => {
+    // Open cancel reason modal
+    setSelectedBookingId(bookingId);
+    setShowCancelReasonModal(true);
+    setSelectedCancelReason('');
+    setCustomCancelReason('');
+  };
+
+  const handleCloseCancelReasonModal = () => {
+    setShowCancelReasonModal(false);
+    setSelectedBookingId(null);
+    setSelectedCancelReason('');
+    setCustomCancelReason('');
+  };
+
+  const handleSubmitCancelReason = async () => {
+    // Validate that a reason is selected or custom reason is entered
+    if (!selectedCancelReason) {
+      alert('Please select a cancellation reason.');
+      return;
+    }
+
+    if (selectedCancelReason === 'Others' && !customCancelReason.trim()) {
+      alert('Please enter your cancellation reason.');
+      return;
+    }
+
+    if (!selectedBookingId) {
+      alert('Booking ID is missing.');
+      return;
+    }
+
+    try {
+      setCancelling(true);
+      
+      // Prepare cancel reason
+      const cancelReason = selectedCancelReason === 'Others' 
+        ? customCancelReason.trim() 
+        : selectedCancelReason;
+      
+      // Close modal
+      setShowCancelReasonModal(false);
+      
+      // Call cancelBooking with reason
+      await cancelBooking(selectedBookingId, cancelReason);
+      
+      // Reset state
+      setSelectedBookingId(null);
+      setSelectedCancelReason('');
+      setCustomCancelReason('');
+    } catch (error) {
+      alert(error?.message || 'Failed to cancel booking. Please try again.');
+      setShowCancelReasonModal(true); // Reopen modal on error
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -362,6 +415,93 @@ function BookingStatusScreen() {
         </div>
       </div>
       <ClientFooter/>
+
+      {/* Cancel Reason Modal */}
+      {showCancelReasonModal && (
+        <div className="modal-overlay" onClick={handleCloseCancelReasonModal}>
+          <div className="modal-content cancel-reason-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+            <div className="modal-header cancel-reason-modal-header">
+              <h3><FaTimes /> Cancel Booking</h3>
+              <button className="modal-close" onClick={handleCloseCancelReasonModal}>
+                <FaTimes />
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <h4 className="cancel-reason-title">Why are you cancelling this booking?</h4>
+              <p className="cancel-reason-subtitle">Please select a reason for cancellation *</p>
+
+              {/* Cancel Reason Options */}
+              <div className="cancel-reason-options">
+                <button
+                  className={`cancel-reason-option ${selectedCancelReason === 'Not satisfied with the rates' ? 'selected' : ''}`}
+                  onClick={() => {
+                    setSelectedCancelReason('Not satisfied with the rates');
+                    setCustomCancelReason('');
+                  }}
+                >
+                  Not satisfied with the rates
+                </button>
+
+                <button
+                  className={`cancel-reason-option ${selectedCancelReason === "Don't need Booking anymore" ? 'selected' : ''}`}
+                  onClick={() => {
+                    setSelectedCancelReason("Don't need Booking anymore");
+                    setCustomCancelReason('');
+                  }}
+                >
+                  Don't need Booking anymore
+                </button>
+
+                <button
+                  className={`cancel-reason-option ${selectedCancelReason === 'Others' ? 'selected' : ''}`}
+                  onClick={() => {
+                    setSelectedCancelReason('Others');
+                  }}
+                >
+                  Others
+                </button>
+              </div>
+
+              {/* Custom Reason Input - Show when "Others" is selected */}
+              {selectedCancelReason === 'Others' && (
+                <div className="custom-reason-container">
+                  <label className="custom-reason-label">Please specify your reason *</label>
+                  <textarea
+                    className="custom-reason-input"
+                    placeholder="Enter your cancellation reason"
+                    rows={4}
+                    value={customCancelReason}
+                    onChange={(e) => setCustomCancelReason(e.target.value)}
+                  />
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="cancel-reason-modal-actions">
+                <button
+                  className="btn btn-secondary"
+                  onClick={handleCloseCancelReasonModal}
+                  disabled={cancelling}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleSubmitCancelReason}
+                  disabled={cancelling}
+                  style={{
+                    opacity: cancelling ? 0.6 : 1,
+                    cursor: cancelling ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {cancelling ? 'Cancelling...' : 'Confirm'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
