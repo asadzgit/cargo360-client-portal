@@ -296,6 +296,19 @@ function BookingStatusScreen() {
       </div>
     </div>
 
+    {(booking?.Trucker || booking?.trucker) && (
+      <div className="info-row">
+        <div className="info-item">
+          <strong>Trucker:</strong>
+          <span>{booking?.Trucker?.name || booking?.trucker?.name}</span>
+        </div>
+        <div className="info-item">
+          <strong>Phone:</strong>
+          <span>{booking?.Trucker?.phone || booking?.trucker?.phone}</span>
+        </div>
+      </div>
+    )}
+
     <div className="info-row">
       <div className="info-item">
         <strong>Created:</strong>
@@ -308,18 +321,6 @@ function BookingStatusScreen() {
         </div>
       )}
     </div>
-    {booking.Trucker && (
-      <div className="info-row">
-        <div className="info-item">
-          <strong>Trucker:</strong>
-          <span>{booking.Trucker.name}</span>
-        </div>
-        <div className="info-item">
-          <strong>Phone:</strong>
-          <span>{booking.Trucker.phone}</span>
-        </div>
-      </div>
-    )}
 
      {/* <div className="info-row">
       <div className='info-item'><strong>Insurance:</strong> <span>{booking.insurance ? "Yes" : "No"}</span></div>
