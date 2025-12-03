@@ -11,6 +11,8 @@ import HomePage from './screens/HomePage';
 import BookTruckScreen from './screens/BookTruckScreen';
 import BookingStatusScreen from './screens/BookingStatusScreen';
 import BookingDetailScreen from './screens/BookingDetailScreen';
+import ClearanceStatusScreen from './screens/ClearanceStatusScreen';
+import ClearanceDetailScreen from './screens/ClearanceDetailScreen';
 import TabNavigation from './components/TabNavigation';
 import VerificationSuccess from './screens/VerificationSuccess';
 import VerificationFailure from './screens/VerificationFailure';
@@ -153,6 +155,28 @@ function AppContent() {
             <ProtectedRoute>
               <div className="main-content">
                 <BookingDetailScreen />
+                <TabNavigation />
+              </div>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/clearance" 
+          element={
+            <ProtectedRoute>
+              <div className="main-content">
+                <ClearanceStatusScreen />
+                <TabNavigation />
+              </div>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/clearance/:id" 
+          element={
+            <ProtectedRoute>
+              <div className="main-content">
+                <ClearanceDetailScreen />
                 <TabNavigation />
               </div>
             </ProtectedRoute>

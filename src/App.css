@@ -287,6 +287,21 @@ p {
   color: #991b1b;
 }
 
+.status-under-review {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #1d4ed8;
+}
+
+.status-approved {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #047857;
+}
+
+.status-rejected {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: #991b1b;
+}
+
 /* Links */
 .link {
   color: var(--accent-color);
