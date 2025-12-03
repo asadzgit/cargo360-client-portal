@@ -341,10 +341,6 @@ const numberToWords = (num) => {
                         <label>Sales Tax Invoice:</label> 
                         <value>{booking.salesTax ? "Yes" : "No"}</value>
                       </div>
-                      <div className='info-item'>
-                        <label>Clearing Agent Number:</label> 
-                        <value>{booking.clearingAgentNum || "Not provided"}</value>
-                      </div>
                   </div>
                 </div>
               </div>

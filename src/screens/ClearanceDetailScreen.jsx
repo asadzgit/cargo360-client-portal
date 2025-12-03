@@ -82,8 +82,11 @@ function ClearanceDetailScreen() {
       // Close modal
       setShowCancelReasonModal(false);
       
-      // Delete the clearance request
-      await clearanceAPI.delete(id);
+      // Update the clearance request status to 'cancelled' instead of deleting
+      await clearanceAPI.update(id, {
+        status: 'cancelled',
+        cancelReason: cancelReason
+      });
       
       // Reset state
       setSelectedCancelReason('');
@@ -141,6 +144,8 @@ function ClearanceDetailScreen() {
         return <FaCheckCircle />;
       case 'rejected':
         return <FaTimes />;
+      case 'cancelled':
+        return <FaTimes />;
       default:
         return <FaClock />;
     }
@@ -155,6 +160,8 @@ function ClearanceDetailScreen() {
       case 'approved':
         return 'var(--success-color)';
       case 'rejected':
+        return 'var(--danger-color)';
+      case 'cancelled':
         return 'var(--danger-color)';
       default:
         return 'var(--text-light)';
@@ -259,6 +266,7 @@ function ClearanceDetailScreen() {
                     {renderMetaRow('City', request.city)}
                     {renderMetaRow('Container Type', request.containerType)}
                     {renderMetaRow('Transport Mode', request.transportMode)}
+                    {renderMetaRow('Clearing Agent Number', request.clearingAgentNum || 'Not provided')}
                     {renderMetaRow('Created At', formatDateTime(request.createdAt))}
                     {request.updatedAt && renderMetaRow('Last Updated', formatDateTime(request.updatedAt))}
                   </div>

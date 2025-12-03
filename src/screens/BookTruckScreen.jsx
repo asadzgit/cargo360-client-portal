@@ -36,7 +36,6 @@ function BookTruckScreen() {
     numContainers: "",
     bookingDate: new Date().toISOString().split("T")[0], // auto-set to today
     deliveryDate: "",
-    clearingAgentNum: "",
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -395,32 +394,6 @@ const handleDeliveryDateChange = (e) => {
       }
     }
 
-    // ✅ Special validation for clearingAgentNum - only digits, max 11
-    if (name === "clearingAgentNum") {
-      // Remove any non-digit characters
-      const digitsOnly = value.replace(/\D/g, "");
-      // Limit to 11 digits
-      const limitedValue = digitsOnly.slice(0, 11);
-      
-      // Validate length if user has entered something
-      if (limitedValue && limitedValue.length !== 11) {
-        setErrors((prev) => ({
-          ...prev,
-          clearingAgentNum: "Clearing agent number must be exactly 11 digits",
-        }));
-      } else if (limitedValue && limitedValue.length === 11) {
-        setErrors((prev) => ({ ...prev, clearingAgentNum: "" }));
-      } else {
-        setErrors((prev) => ({ ...prev, clearingAgentNum: "" }));
-      }
-
-      setFormData((prev) => ({
-        ...prev,
-        [name]: limitedValue,
-      }));
-      return;
-    }
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -529,14 +502,6 @@ const handleDeliveryDateChange = (e) => {
       newErrors.budget = "Please enter a valid budget amount";
     }
 
-    // ✅ Clearing Agent Number validation - must be exactly 11 digits if provided
-    if (formData.clearingAgentNum) {
-      const digitsOnly = formData.clearingAgentNum.replace(/\D/g, "");
-      if (digitsOnly.length !== 11) {
-        newErrors.clearingAgentNum = "Clearing agent number must be exactly 11 digits";
-      }
-    }
-
     // if (formData.insurance && !formData.insuranceFile) {
     //   newErrors.insuranceFile = "Please attach the insurance invoice file";
     // }
@@ -576,9 +541,6 @@ const handleDeliveryDateChange = (e) => {
           : undefined,
         insurance: formData.insurance || undefined,
         salesTax: formData.salesTax || undefined,
-        clearingAgentNum: formData.clearingAgentNum && formData.clearingAgentNum.trim() 
-          ? formData.clearingAgentNum.trim() 
-          : undefined,
 
         bookingDate: formData.bookingDate,
         deliveryDate: formData.deliveryDate,
@@ -935,27 +897,6 @@ const handleDeliveryDateChange = (e) => {
                     />
                     Sales Tax Invoice
                   </label>
-                </div>
-
-                {/* Clearing Agent Number Field */}
-                <div className="form-group">
-                  <label className="form-label">Clearing Agent Number</label>
-                  <input
-                    type="text"
-                    name="clearingAgentNum"
-                    className={`form-input ${
-                      errors.clearingAgentNum ? "error" : ""
-                    }`}
-                    value={formData.clearingAgentNum}
-                    onChange={handleChange}
-                    placeholder="Enter 11-digit clearing agent number"
-                    maxLength={11}
-                    inputMode="numeric"
-                    pattern="[0-9]{11}"
-                  />
-                  {errors.clearingAgentNum && (
-                    <div className="form-error">{errors.clearingAgentNum}</div>
-                  )}
                 </div>
 
                 {/* File upload field appears ONLY when Insurance is checked */}

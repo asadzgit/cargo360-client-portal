@@ -96,8 +96,11 @@ function ClearanceStatusScreen() {
       // Close modal
       setShowCancelReasonModal(false);
       
-      // Delete the clearance request
-      await clearanceAPI.delete(selectedRequestId);
+      // Update the clearance request status to 'cancelled' instead of deleting
+      await clearanceAPI.update(selectedRequestId, {
+        status: 'cancelled',
+        cancelReason: cancelReason
+      });
       
       // Reset state
       setSelectedRequestId(null);
