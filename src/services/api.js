@@ -245,6 +245,52 @@ export const bookingAPI = {
   },
 };
 
+// Clearance Request API calls
+export const clearanceAPI = {
+  // List clearance requests (with optional filters)
+  list: async (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return apiRequest(`/clearance-requests${queryString ? `?${queryString}` : ''}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+  },
+
+  // Get single clearance request
+  get: async (id) => {
+    return apiRequest(`/clearance-requests/${id}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+  },
+
+  // Create clearance request
+  create: async (requestData) => {
+    return apiRequest('/clearance-requests', {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      data: requestData,
+    });
+  },
+
+  // Update clearance request
+  update: async (id, requestData) => {
+    return apiRequest(`/clearance-requests/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      data: requestData,
+    });
+  },
+
+  // Delete clearance request
+  delete: async (id) => {
+    return apiRequest(`/clearance-requests/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+  },
+};
+
 // Token management utilities
 export const tokenUtils = {
   setTokens: (accessToken, refreshToken) => {

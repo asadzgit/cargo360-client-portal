@@ -305,6 +305,18 @@ const numberToWords = (num) => {
                       <label>Cargo Type</label>
                       <value>{humanize(booking.cargoType)}</value>
                     </div>
+                    {(booking?.Trucker || booking?.trucker) && (
+                      <>
+                        <div className="info-item">
+                          <label>Trucker</label>
+                          <value>{booking?.Trucker?.name || booking?.trucker?.name}</value>
+                        </div>
+                        <div className="info-item">
+                          <label>Phone</label>
+                          <value>{booking?.Trucker?.phone || booking?.trucker?.phone}</value>
+                        </div>
+                      </>
+                    )}
                     {booking.cargoWeight && (
                       <div className="info-item">
                         <label>Weight</label>
@@ -328,10 +340,6 @@ const numberToWords = (num) => {
                       <div className='info-item'>
                         <label>Sales Tax Invoice:</label> 
                         <value>{booking.salesTax ? "Yes" : "No"}</value>
-                      </div>
-                      <div className='info-item'>
-                        <label>Clearing Agent Number:</label> 
-                        <value>{booking.clearingAgentNum || "Not provided"}</value>
                       </div>
                   </div>
                 </div>
@@ -600,7 +608,7 @@ const numberToWords = (num) => {
 
           {/* Action Buttons */}
           <div className="detail-actions">
-            {['pending', 'accepted'].includes(booking.status.toLowerCase()) && (
+            {booking.status.toLowerCase() === 'pending' && (
               <>
                 <button 
                   className="btn btn-accent"

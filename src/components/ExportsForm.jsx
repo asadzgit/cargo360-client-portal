@@ -6,6 +6,7 @@ function ExportsForm({ onSubmit }) {
     city: "LHR",
     transportMode: "air",
     containerType: "LCL",
+    clearingAgentNum: "",
     files: {},
   });
 
@@ -32,6 +33,14 @@ function ExportsForm({ onSubmit }) {
         newErrors[field] = `${getLabel(field)} is required`;
       }
     });
+
+    // Validate clearing agent number if provided
+    if (formData.clearingAgentNum) {
+      const digitsOnly = formData.clearingAgentNum.replace(/\D/g, "");
+      if (digitsOnly.length !== 11) {
+        newErrors.clearingAgentNum = "Clearing agent number must be exactly 11 digits";
+      }
+    }
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -62,6 +71,25 @@ function ExportsForm({ onSubmit }) {
       files: { ...prev.files, [field]: value },
     }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
+
+  // Handle clearing agent number input
+  const handleClearingAgentNumChange = (e) => {
+    const value = e.target.value;
+    // Remove any non-digit characters
+    const digitsOnly = value.replace(/\D/g, "");
+    // Limit to 11 digits
+    const limitedValue = digitsOnly.slice(0, 11);
+    
+    setFormData((prev) => ({
+      ...prev,
+      clearingAgentNum: limitedValue,
+    }));
+
+    // Clear error when user starts typing
+    if (errors.clearingAgentNum) {
+      setErrors((prev) => ({ ...prev, clearingAgentNum: "" }));
+    }
   };
 
   // Document list
@@ -246,6 +274,29 @@ function ExportsForm({ onSubmit }) {
               FCL
             </button>
           </div>
+        </div>
+
+        {/* Clearing Agent Number */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-slate-700 mb-3">
+            Clearing Agent Number
+          </label>
+          <input
+            type="text"
+            value={formData.clearingAgentNum}
+            onChange={handleClearingAgentNumChange}
+            placeholder="Enter 11-digit clearing agent number"
+            maxLength={11}
+            inputMode="numeric"
+            pattern="[0-9]{11}"
+            className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500"
+            style={{ padding: "8px 10px" }}
+          />
+          {errors.clearingAgentNum && (
+            <p className="text-red-500 text-xs mt-1 error-msg" style={{color:'red'}}>
+              {errors.clearingAgentNum}
+            </p>
+          )}
         </div>
 
         {/* --- Document Uploads --- */}
