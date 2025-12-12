@@ -17,14 +17,57 @@ function SignupScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [companyError, setCompanyError] = useState('');
   const { signup } = useAuth();
   const navigate = useNavigate();
 
+  const validateCompany = (value) => {
+    if (!value || value.trim().length === 0) {
+      return 'Company name is required';
+    }
+    if (value.length < 3) {
+      return 'Company name must be at least 3 characters';
+    }
+    if (!/^[a-zA-Z\s]+$/.test(value)) {
+      return 'Company name can only contain letters and spaces';
+    }
+    return '';
+  };
+
   const handleChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    const { name, value } = e.target;
+    
+    // For company name, only allow letters and spaces
+    if (name === 'company') {
+      // Check if invalid characters are being typed
+      const hasInvalidChars = /[^a-zA-Z\s]/.test(value);
+      
+      // Remove any non-letter, non-space characters
+      const sanitized = value.replace(/[^a-zA-Z\s]/g, '');
+      setFormData(prev => ({
+        ...prev,
+        [name]: sanitized
+      }));
+      
+      // Show error immediately if invalid characters detected
+      if (hasInvalidChars) {
+        setCompanyError('Company name can only contain letters and spaces');
+      } else {
+        // Validate immediately and show error
+        const error = validateCompany(sanitized);
+        setCompanyError(error);
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
+
+  const handleCompanyBlur = (e) => {
+    const error = validateCompany(e.target.value);
+    setCompanyError(error);
   };
 
   const validateForm = () => {
@@ -36,8 +79,12 @@ function SignupScreen() {
       return 'Name must be at least 2 characters';
     }
 
-    if (formData.company.length < 2) { // 🔹 Added company name length validation
-      return 'Company name must be at least 2 characters';
+    // Validate company name: minimum 3 characters, letters and spaces only
+    if (formData.company.length < 3) {
+      return 'Company name must be at least 3 characters';
+    }
+    if (!/^[a-zA-Z\s]+$/.test(formData.company)) {
+      return 'Company name can only contain letters and spaces';
     }
     
     if (formData.phone.length < 6) {
@@ -63,6 +110,15 @@ function SignupScreen() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
+    // Validate company field
+    const companyValidationError = validateCompany(formData.company);
+    if (companyValidationError) {
+      setCompanyError(companyValidationError);
+      setError(companyValidationError);
+      return;
+    }
+    setCompanyError('');
     
     const validationError = validateForm();
     if (validationError) {
@@ -137,12 +193,14 @@ function SignupScreen() {
             <input
               type="text"
               name="company"
-              className="form-input"
+              className={`form-input ${companyError ? 'input-error' : ''}`}
               value={formData.company}
               onChange={handleChange}
-              placeholder="Enter your company name"
+              onBlur={handleCompanyBlur}
+              placeholder="Enter company name"
               autoComplete="organization"
             />
+            {companyError && <div className="field-error">{companyError}</div>}
           </div>
 
           <div className="form-group">
