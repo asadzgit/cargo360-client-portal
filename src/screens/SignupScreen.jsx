@@ -28,8 +28,19 @@ function SignupScreen() {
     if (value.length < 3) {
       return 'Company name must be at least 3 characters';
     }
-    if (!/^[a-zA-Z\s]+$/.test(value)) {
-      return 'Company name can only contain letters and spaces';
+    // Check if contains invalid characters (only allow letters, digits, spaces)
+    if (!/^[a-zA-Z0-9\s]+$/.test(value)) {
+      return 'Company name can only contain letters, numbers, and spaces';
+    }
+    // Count letters in the company name
+    const letterCount = (value.match(/[a-zA-Z]/g) || []).length;
+    if (letterCount < 3) {
+      return 'Company name must contain at least 3 letters';
+    }
+    // Check if it's only digits
+    const isOnlyDigits = /^\d+$/.test(value.replace(/\s/g, ''));
+    if (isOnlyDigits) {
+      return 'Company name cannot contain only digits';
     }
     return '';
   };
@@ -37,13 +48,13 @@ function SignupScreen() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // For company name, only allow letters and spaces
+    // For company name, allow letters, digits, and spaces
     if (name === 'company') {
-      // Check if invalid characters are being typed
-      const hasInvalidChars = /[^a-zA-Z\s]/.test(value);
+      // Check if invalid characters are being typed (only allow letters, digits, spaces)
+      const hasInvalidChars = /[^a-zA-Z0-9\s]/.test(value);
       
-      // Remove any non-letter, non-space characters
-      const sanitized = value.replace(/[^a-zA-Z\s]/g, '');
+      // Remove any invalid characters (keep only letters, digits, spaces)
+      const sanitized = value.replace(/[^a-zA-Z0-9\s]/g, '');
       setFormData(prev => ({
         ...prev,
         [name]: sanitized
@@ -51,7 +62,7 @@ function SignupScreen() {
       
       // Show error immediately if invalid characters detected
       if (hasInvalidChars) {
-        setCompanyError('Company name can only contain letters and spaces');
+        setCompanyError('Company name can only contain letters, numbers, and spaces');
       } else {
         // Validate immediately and show error
         const error = validateCompany(sanitized);
@@ -79,12 +90,10 @@ function SignupScreen() {
       return 'Name must be at least 2 characters';
     }
 
-    // Validate company name: minimum 3 characters, letters and spaces only
-    if (formData.company.length < 3) {
-      return 'Company name must be at least 3 characters';
-    }
-    if (!/^[a-zA-Z\s]+$/.test(formData.company)) {
-      return 'Company name can only contain letters and spaces';
+    // Validate company name: minimum 3 characters, at least 3 letters, cannot be only digits
+    const companyError = validateCompany(formData.company);
+    if (companyError) {
+      return companyError;
     }
     
     if (formData.phone.length < 6) {

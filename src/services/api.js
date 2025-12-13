@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Hardcoded API base URL - change this manually for development/production
-const API_BASE_URL = 'https://cargo360-api.onrender.com/';
+const API_BASE_URL = 'http://localhost:4000/';
 
 // Create axios instance
 const apiClient = axios.create({
