@@ -1,7 +1,17 @@
 import axios from 'axios';
 
+<<<<<<< Updated upstream
 // Hardcoded API base URL - change this manually for development/production
 const API_BASE_URL = 'https://cargo360-api.onrender.com/';
+=======
+// Get API base URL with priority:
+// 1) Vite env (from .env.local) - for local backend development (highest priority)
+// 2) config.js (window.APP_CONFIG) - production API (fallback)
+// 3) Fallback to localhost
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ||
+  (window.APP_CONFIG?.API_BASE_URL) ||
+  'http://localhost:4000/';
+>>>>>>> Stashed changes
 
 // Create axios instance
 const apiClient = axios.create({

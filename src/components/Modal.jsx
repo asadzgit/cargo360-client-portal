@@ -2,7 +2,7 @@ import { useState } from "react";
 import ImportsForm from "./ImportsForm.jsx";
 import ExportsForm from "./ExportsForm.jsx";
 import FreightForm from "./FreightForm.jsx";
-import { clearanceAPI } from "../services/api";
+import { clearanceAPI, API_BASE_URL } from "../services/api";
 import axios from "axios";
 
 /**
@@ -29,7 +29,6 @@ function Modal({ isOpen, onClose }) {
   // Upload a single document
   const uploadDocument = async (file, documentType) => {
     const token = localStorage.getItem("accessToken");
-    const API_BASE_URL = "https://cargo360-api.onrender.com/";
 
     const formData = new FormData();
     formData.append("file", file);
