@@ -491,9 +491,9 @@ const numberToWords = (num) => {
                   <div className="pricing-breakdown">
                   {booking.budget && (
                     <>
-                      {/* Admin Budget - Always show original budget */}
+                      {/* Estimated Budget - Admin's Original Budget - Always show */}
                       <div className="price-item">
-                        <label>Admin Budget</label>
+                        <label>Estimated Budget</label>
                         <value>PKR {parseFloat(booking.budget).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</value>
                       </div>
 
@@ -505,12 +505,11 @@ const numberToWords = (num) => {
                         </div>
                       )}
                       
-                      {booking.DiscountRequest && booking.DiscountRequest.status === 'accepted' && (
-                        <div className="price-item" style={{color: '#10b981'}}>
-                          <label>Discount You Get</label>
-                          <value>PKR {(
-                            parseFloat(booking.budget) - parseFloat(booking.DiscountRequest.requestAmount)
-                          ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</value>
+                      {/* When discount is accepted, show accepted amount and discount */}
+                      {booking.DiscountRequest && booking.DiscountRequest.status === 'accepted' && booking.totalAmount && (
+                        <div className="price-item" style={{borderBottom: 'none'}}>
+                          <label>Accepted Discount Amount</label>
+                          <value>PKR {parseFloat(booking.DiscountRequest.requestAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</value>
                         </div>
                       )}
                       
@@ -523,7 +522,7 @@ const numberToWords = (num) => {
 
                       {/* Discount Request Input - Only show if no request exists or request was rejected */}
                       {(!booking.DiscountRequest || booking.DiscountRequest.status === 'rejected') && (
-                        <div className='flex align-items-center gap-2' style={{marginTop: '15px', marginBottom: '15px'}}>
+                        <div className='flex align-items-center gap-2' style={{marginTop: '16px', marginBottom: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.1)'}}>
                           <p style={{color: 'white'}}>Want a discount? <br></br> Enter your budget (PKR)</p>
                           <input
                             className='form-input' 
@@ -547,11 +546,13 @@ const numberToWords = (num) => {
                         </div>
                       )}
 
-                      {/* Total Budget - Show totalAmount if discount accepted, otherwise show original budget */}
-                      <div className="price-item total" style={{marginTop: '15px', paddingTop: '15px', borderTop: '1px solid #333'}}>
+                      {/* Total Budget - Show discount amount if discount accepted, otherwise show original budget */}
+                      <div className="price-item total">
                         <label>Total Budget</label>
                         <value>PKR {booking.totalAmount 
-                          ? parseFloat(booking.totalAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                          ? (
+                            parseFloat(booking.budget) - parseFloat(booking.totalAmount)
+                          ).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                           : parseFloat(booking.budget).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                         }</value>
                       </div>
@@ -561,13 +562,18 @@ const numberToWords = (num) => {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginTop: '10px',
+                        marginTop: '16px',
+                        paddingTop: '16px',
+                        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
                         color: 'var(--accent-color)',
                         fontWeight: 600,
                         fontSize: '15px'
                       }}>
                         <span>Amount in words</span>
-                        <span>{numberToWords(booking.totalAmount ? parseFloat(booking.totalAmount) : parseFloat(booking.budget))}</span>
+                        <span>{numberToWords(booking.totalAmount 
+                          ? parseFloat(booking.budget) - parseFloat(booking.totalAmount)
+                          : parseFloat(booking.budget)
+                        )}</span>
                       </div>
                     </>
                   )}
