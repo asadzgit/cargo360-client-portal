@@ -133,6 +133,23 @@
   font-weight: 500;
 }
 
+.field-error {
+  color: var(--error-color);
+  font-size: 12px;
+  margin-top: 4px;
+  margin-bottom: 0;
+  padding-left: 4px;
+}
+
+.input-error {
+  border-color: var(--error-color) !important;
+}
+
+.input-error:focus {
+  border-color: var(--error-color) !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
 .success-message {
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.3);
