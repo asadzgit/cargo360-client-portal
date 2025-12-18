@@ -59,7 +59,9 @@ function ResetPasswordScreen() {
     setLoading(true);
     
     try {
-      await forgotPassword(formData.email);
+      // Normalize email to lowercase for case-insensitive handling
+      const normalizedEmail = formData.email.toLowerCase().trim();
+      await forgotPassword(normalizedEmail);
       setStep(2);
     } catch (err) {
       setError(err.message || 'Failed to send reset code. Please try again.');

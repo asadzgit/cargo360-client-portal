@@ -73,15 +73,17 @@ function SignupScreen() {
     setLoading(true);
 
     try {
+      // Normalize email to lowercase for case-insensitive handling
+      const normalizedEmail = formData.email.toLowerCase().trim();
       const response = await signup({
         name: formData.name,
-        email: formData.email,
+        email: normalizedEmail,
         company: formData.company, // 🔹 Include company in signup data
         phone: formData.phone,
         password: formData.password
       });
       // Store email for confirmation screen
-      localStorage.setItem('pendingConfirmationEmail', formData.email);
+      localStorage.setItem('pendingConfirmationEmail', normalizedEmail);
       navigate('/confirm-account');
     } catch (err) {
       setError(err.message);
