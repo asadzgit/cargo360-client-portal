@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaWeight, FaClock, FaPhone, FaUser, FaRoute, FaMoneyBill, FaClipboardCheck, FaTimes, FaCar, FaEdit, FaPlus } from 'react-icons/fa';
+import { FaArrowLeft, FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaWeight, FaClock, FaPhone, FaUser, FaRoute, FaMoneyBill, FaClipboardCheck, FaTimes, FaCar, FaEdit, FaPlus, FaPrint } from 'react-icons/fa';
 import { useBooking } from '../context/BookingContext';
+import { useAuth } from '../context/AuthContext';
 import LocationTrackingModal from '../components/LocationTrackingModal';
 import EditBookingModal from '../components/EditBookingModal';
 import { humanize } from '../utils/helpers';
@@ -10,10 +11,13 @@ import {ClientFooter} from '../components/ClientFooter';
 import Modal from '../components/Modal';
 import './BookingDetailScreen.css';
 
+// const PRINTABLE_STATUSES = ['confirmed', 'picked_up', 'in_transit', 'delivered', 'completed'];
+
 function BookingDetailScreen() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { fetchBooking, cancelBooking, loading, error } = useBooking();
+  const { user } = useAuth();
   const [booking, setBooking] = useState(null);
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -27,6 +31,7 @@ function BookingDetailScreen() {
   const [selectedCancelReason, setSelectedCancelReason] = useState('');
   const [customCancelReason, setCustomCancelReason] = useState('');
   const [cancelling, setCancelling] = useState(false);
+  // const [invoiceGenerating, setInvoiceGenerating] = useState(false);
 
   useEffect(() => {
     const loadBooking = async () => {
@@ -37,13 +42,11 @@ function BookingDetailScreen() {
         console.error('Failed to load booking:', error);
       }
     };
-    console.log('hello world')
 
     loadBooking();
   }, [id]);
 
   const handleEditSuccess = async () => {
-    // Refresh booking data after successful edit
     try {
       const bookingData = await fetchBooking(id);
       setBooking(bookingData);
@@ -119,16 +122,11 @@ function BookingDetailScreen() {
       const msg = res?.message || 'Discount request created';
       alert(msg);
   
-      // Optional: refresh booking
       try {
         const bookingData = await fetchBooking(id);
         setBooking(bookingData);
       } catch {}
     } catch (e) {
-      // Common backend errors:
-      // 404 Not Found (not owned or not found)
-      // 409 Conflict (request already exists)
-      // 400 Validation (invalid amount)
       alert(e?.message || 'Failed to create discount request');
     } finally {
       setDiscountLoading(false);
@@ -145,17 +143,14 @@ function BookingDetailScreen() {
       setConfirmLoading(true);
       const res = await bookingAPI.confirmShipment(id);
       
-      // Refresh booking to get updated status
       try {
         const bookingData = await fetchBooking(id);
         setBooking(bookingData);
       } catch {}
       
-      // Close modal
       setShowConfirmModal(false);
       setAgreedToTerms(false);
       
-      // Show success message
       alert('Order Confirmed!\n\nYour shipment has been confirmed successfully. You will be notified shortly after a driver picks up this order.');
     } catch (e) {
       alert(e?.message || 'Failed to confirm order. Please try again.');
@@ -227,37 +222,338 @@ function BookingDetailScreen() {
     }
   };
 
-  // Converts numbers to words (simple PKR format)
-const numberToWords = (num) => {
-  if (num === 0) return "Zero Only";
+  const numberToWords = (num) => {
+    if (num === 0) return "Zero Only";
 
-  const a = [
-    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
-    "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen",
-    "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
-  ];
-  const b = [
-    "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
-  ];
+    const a = [
+      "", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
+      "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen",
+      "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
+    ];
+    const b = [
+      "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
+    ];
 
-  const numToWords = (n) => {
-    if (n < 20) return a[n];
-    if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
-    if (n < 1000)
-      return a[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " " + numToWords(n % 100) : "");
-    if (n < 1000000)
-      return numToWords(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + numToWords(n % 1000) : "");
-    if (n < 1000000000)
-      return numToWords(Math.floor(n / 1000000)) + " Million" + (n % 1000000 ? " " + numToWords(n % 1000000) : "");
-    return num.toString();
+    const numToWords = (n) => {
+      if (n < 20) return a[n];
+      if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
+      if (n < 1000)
+        return a[Math.floor(n / 100)] + " Hundred" + (n % 100 ? " " + numToWords(n % 100) : "");
+      if (n < 1000000)
+        return numToWords(Math.floor(n / 1000)) + " Thousand" + (n % 1000 ? " " + numToWords(n % 1000) : "");
+      if (n < 1000000000)
+        return numToWords(Math.floor(n / 1000000)) + " Million" + (n % 1000000 ? " " + numToWords(n % 1000000) : "");
+      return num.toString();
+    };
+
+    return numToWords(num) + " Only";
   };
 
-  return numToWords(num) + " Only";
-};
+  const formatDeliveryDate = (raw) => {
+    if (!raw) return 'Not set';
 
-// Just to check the the amount in words is working or not
-// const testBudget = 508000; // Try changing this value
-// console.log(numberToWords(testBudget));
+    if (raw.includes?.('T')) {
+      const parsedISO = new Date(raw);
+      if (!Number.isNaN(parsedISO.getTime())) {
+        return parsedISO.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+      }
+    }
+
+    const [datePart, timePart] = raw.split(' ');
+    const dateSegments = datePart?.split('/') || [];
+
+    if (dateSegments.length !== 3) return 'Not set';
+
+    const [dayStr, monthStr, yearStr] = dateSegments;
+    const day = Number(dayStr);
+    const month = Number(monthStr);
+    const year = Number(yearStr);
+
+    if ([day, month, year].some(Number.isNaN)) return 'Not set';
+
+    let hours = 0;
+    let minutes = 0;
+
+    if (timePart) {
+      const [hm, ampm] = timePart.split(/(AM|PM)/i).filter(Boolean);
+      if (hm) {
+        const [hr, min] = hm.split(':').map(Number);
+        hours = Number.isNaN(hr) ? 0 : hr;
+        minutes = Number.isNaN(min) ? 0 : min;
+      }
+
+      if (ampm) {
+        const upper = ampm.toUpperCase();
+        if (upper === 'PM' && hours !== 12) hours += 12;
+        if (upper === 'AM' && hours === 12) hours = 0;
+      }
+    }
+
+    const parsed = new Date(year, month - 1, day, hours, minutes);
+    if (Number.isNaN(parsed.getTime())) return 'Not set';
+    return parsed.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  const formatDateTime = (value, withTime = true) => {
+    if (!value) return 'Not set';
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return 'Not set';
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    };
+    if (withTime) {
+      options.hour = '2-digit';
+      options.minute = '2-digit';
+    }
+    return parsed.toLocaleDateString('en-US', options);
+  };
+
+  const formatCurrency = (value) => {
+    if (!value && value !== 0) return 'PKR 0';
+    const numeric = Number(value);
+    if (Number.isNaN(numeric)) return `PKR ${value}`;
+    return `PKR ${numeric.toLocaleString('en-US')}`;
+  };
+
+  const getCustomerField = (bookingField, fallbackUserField, defaultText = '—') => {
+    return bookingField || fallbackUserField || defaultText;
+  };
+
+  //code to print invoive
+  // const generateInvoiceHTML = (currentBooking) => {
+  //   const now = new Date();
+  //   const invoiceId = `INV-${currentBooking.id}-${now.getTime()}`;
+  //   const invoiceDate = now.toLocaleString('en-US', {
+  //     year: 'numeric',
+  //     month: 'short',
+  //     day: 'numeric',
+  //     hour: '2-digit',
+  //     minute: '2-digit',
+  //   });
+  //   const bookingDate = formatDateTime(currentBooking.createdAt, false);
+  //   const deliveryDate = formatDeliveryDate(currentBooking.deliveryDate);
+  //   const customerName = getCustomerField(currentBooking?.Customer?.name, user?.name, 'Valued Customer');
+  //   const customerCompany = getCustomerField(currentBooking?.Customer?.company, user?.company);
+  //   const customerEmail = getCustomerField(currentBooking?.Customer?.email, user?.email);
+  //   const customerPhone = getCustomerField(currentBooking?.Customer?.phone, user?.phone);
+  //   const driverName = currentBooking?.Trucker?.name || 'Pending Assignment';
+  //   const driverPhone = currentBooking?.Trucker?.phone || 'Pending Assignment';
+  //   const amountNumeric = Number(currentBooking?.budget) || 0;
+  //   const amountWords = numberToWords(amountNumeric);
+
+  //   return `
+  //     <!DOCTYPE html>
+  //     <html>
+  //       <head>
+  //         <title>Invoice ${invoiceId}</title>
+  //         <style>
+  //           body {
+  //             font-family: 'Segoe UI', Arial, sans-serif;
+  //             margin: 0;
+  //             padding: 24px;
+  //             color: #111827;
+  //             background: #f3f4f6;
+  //           }
+  //           .invoice-container {
+  //             max-width: 820px;
+  //             margin: 0 auto;
+  //             background: #ffffff;
+  //             border-radius: 12px;
+  //             padding: 32px;
+  //             box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+  //           }
+  //           .invoice-header {
+  //             display: flex;
+  //             justify-content: space-between;
+  //             align-items: flex-start;
+  //             border-bottom: 2px solid #e5e7eb;
+  //             padding-bottom: 24px;
+  //             margin-bottom: 24px;
+  //           }
+  //           .invoice-title {
+  //             font-size: 28px;
+  //             margin: 0;
+  //             color: #111827;
+  //           }
+  //           .invoice-meta {
+  //             text-align: right;
+  //             font-size: 14px;
+  //             color: #6b7280;
+  //           }
+  //           .section-title {
+  //             font-size: 16px;
+  //             font-weight: 600;
+  //             margin-bottom: 8px;
+  //             color: #111827;
+  //           }
+  //           .info-grid {
+  //             display: grid;
+  //             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  //             gap: 16px;
+  //             margin-bottom: 24px;
+  //           }
+  //           .info-card {
+  //             background: #f9fafb;
+  //             border-radius: 10px;
+  //             padding: 16px;
+  //             border: 1px solid #e5e7eb;
+  //           }
+  //           .info-card label {
+  //             display: block;
+  //             font-size: 12px;
+  //             text-transform: uppercase;
+  //             letter-spacing: 0.05em;
+  //             color: #6b7280;
+  //             margin-bottom: 4px;
+  //           }
+  //           .info-card span {
+  //             font-size: 15px;
+  //             font-weight: 600;
+  //             color: #111827;
+  //           }
+  //           table {
+  //             width: 100%;
+  //             border-collapse: collapse;
+  //             margin-top: 8px;
+  //             margin-bottom: 16px;
+  //           }
+  //           th, td {
+  //             padding: 12px 16px;
+  //             border: 1px solid #e5e7eb;
+  //             text-align: left;
+  //           }
+  //           th {
+  //             background: #f3f4f6;
+  //             font-size: 14px;
+  //             letter-spacing: 0.03em;
+  //             text-transform: uppercase;
+  //             color: #6b7280;
+  //           }
+  //           tfoot td {
+  //             font-size: 18px;
+  //             font-weight: 700;
+  //             background: #111827;
+  //             color: #ffffff;
+  //           }
+  //           .footer-note {
+  //             margin-top: 32px;
+  //             font-size: 13px;
+  //             color: #6b7280;
+  //           }
+  //           .amount-words {
+  //             font-style: italic;
+  //             margin-top: 4px;
+  //             color: #374151;
+  //           }
+  //         </style>
+  //       </head>
+  //       <body>
+  //         <div class="invoice-container">
+  //           <div class="invoice-header">
+  //             <div>
+  //               <h1 class="invoice-title">Cargo360 Shipment Invoice</h1>
+  //               <p style="margin: 4px 0 0; color: #4b5563;">Booking ID: C360-PK-${currentBooking.id}</p>
+  //             </div>
+  //             <div class="invoice-meta">
+  //               <div><strong>Invoice #:</strong> ${invoiceId}</div>
+  //               <div><strong>Date:</strong> ${invoiceDate}</div>
+  //             </div>
+  //           </div>
+
+  //           <div class="info-grid">
+  //             <div class="info-card">
+  //               <label>Billed To</label>
+  //               <span>${customerName}</span><br/>
+  //               <span>${customerCompany}</span><br/>
+  //               <span>${customerEmail}</span><br/>
+  //               <span>${customerPhone}</span>
+  //             </div>
+  //             <div class="info-card">
+  //               <label>Shipment Summary</label>
+  //               <span>Route: ${currentBooking.pickupLocation} → ${currentBooking.dropLocation}</span><br/>
+  //               <span>Vehicle: ${humanize(currentBooking.vehicleType)}</span><br/>
+  //               <span>Cargo: ${humanize(currentBooking.cargoType)}</span><br/>
+  //               <span>Weight: ${currentBooking.cargoWeight || 'N/A'} kg</span>
+  //             </div>
+  //             <div class="info-card">
+  //               <label>Important Dates</label>
+  //               <span>Booked: ${bookingDate}</span><br/>
+  //               <span>Delivery: ${deliveryDate}</span><br/>
+  //               <span>Status: ${humanize(currentBooking.status)}</span>
+  //             </div>
+  //           </div>
+
+  //           <h3 class="section-title">Service Details</h3>
+  //           <table>
+  //             <thead>
+  //               <tr>
+  //                 <th>Description</th>
+  //                 <th>Broker</th>
+  //                 <th>Driver Contact</th>
+  //                 <th>Amount</th>
+  //               </tr>
+  //             </thead>
+  //             <tbody>
+  //               <tr>
+  //                 <td>${humanize(currentBooking.vehicleType)} (${humanize(currentBooking.cargoType)})</td>
+  //                 <td>${driverName}</td>
+  //                 <td>${driverPhone}</td>
+  //                 <td>${formatCurrency(amountNumeric)}</td>
+  //               </tr>
+  //             </tbody>
+  //             <tfoot>
+  //               <tr>
+  //                 <td colspan="3">Grand Total</td>
+  //                 <td>${formatCurrency(amountNumeric)}</td>
+  //               </tr>
+  //             </tfoot>
+  //           </table>
+  //           <div class="amount-words"><strong>Amount in words:</strong> ${amountWords}</div>
+
+  //           <p class="footer-note">
+  //             This invoice is generated for your confirmed Cargo360 shipment. Please retain a copy for your records.
+  //             For any questions, contact support@cargo360.com.
+  //           </p>
+  //         </div>
+  //       </body>
+  //     </html>
+  //   `;
+  // };
+
+  // const handlePrintInvoice = () => {
+  //   if (!booking) return;
+  //   if (typeof window === 'undefined') return;
+  //   try {
+  //     setInvoiceGenerating(true);
+  //     const invoiceWindow = window.open('', '_blank', 'width=900,height=700');
+  //     if (!invoiceWindow) {
+  //       alert('Please allow pop-ups to print the invoice.');
+  //       return;
+  //     }
+  //     invoiceWindow.document.write(generateInvoiceHTML(booking));
+  //     invoiceWindow.document.close();
+  //     invoiceWindow.focus();
+  //     invoiceWindow.print();
+  //     setTimeout(() => {
+  //       invoiceWindow.close();
+  //     }, 200);
+  //   } finally {
+  //     setInvoiceGenerating(false);
+  //   }
+  // };
+
+  // const normalizedStatus = booking.status?.toLowerCase() || '';
+  // const canPrintInvoice = Boolean(booking.budget) && PRINTABLE_STATUSES.includes(normalizedStatus);
 
   return (
     <>
@@ -308,7 +604,7 @@ const numberToWords = (num) => {
                     {(booking?.Trucker || booking?.trucker) && (
                       <>
                         <div className="info-item">
-                          <label>Trucker</label>
+                          <label>Broker</label>
                           <value>{booking?.Trucker?.name || booking?.trucker?.name}</value>
                         </div>
                         <div className="info-item">
@@ -323,19 +619,9 @@ const numberToWords = (num) => {
                         <value><FaWeight /> {booking.cargoWeight} kg</value>
                       </div>
                     )}
-                    {/* {booking.cargoSize && (
-                      <div className="info-item">
-                        <label>Cargo Size</label>
-                        <value>{booking.cargoSize}</value>
-                      </div>
-                    )} */}
                       <div className="info-item ">
                         <label>Cargo Description</label>
                         <value>{booking.description || "No description was given"}</value>
-                      </div>
-                      <div className='info-item'>
-                        <label>Insurance:</label> 
-                        <value>{booking.insurance ? "Yes" : "No"}</value>
                       </div>
                       <div className='info-item'>
                         <label>Sales Tax Invoice:</label> 
@@ -344,6 +630,7 @@ const numberToWords = (num) => {
                   </div>
                 </div>
               </div>
+
               {/* Route Information */}
               <div className="detail-card">
                 <div className="card-header">
@@ -364,7 +651,6 @@ const numberToWords = (num) => {
                         Route
                       </div>
                     </div>
-                    {/* {----} */}
                     
                     <div className="location-item delivery">
                       <FaMapMarkerAlt className="location-icon" />
@@ -377,80 +663,6 @@ const numberToWords = (num) => {
                 </div>
               </div>
 
-              {/* Schedule Information */}
-              {/* <div className="detail-card">
-                <div className="card-header">
-                  <h3><FaCalendarAlt /> Schedule</h3>
-                </div>
-                <div className="card-body">
-                  <div className="info-grid">
-                    <div className="info-item">
-                      <label>Pickup Date</label>
-                      <value>{new Date(booking.pickupDate).toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}</value>
-                    </div>
-                    <div className="info-item">
-                      <label>Delivery Date</label>
-                      <value>{new Date(booking.deliveryDate).toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}</value>
-                    </div>
-                    <div className="info-item">
-                      <label>Booking Created</label>
-                      <value>{new Date(booking.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })} at {new Date(booking.createdAt).toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}</value>
-                    </div>
-                  </div>
-                </div>
-              </div> */}
-
-              {/* Trucker Information */}
-              {/* {booking.Trucker && (
-                <div className="detail-card">
-                  <div className="card-header">
-                    <h3><FaUser /> Trucker Information</h3>
-                  </div>
-                  <div className="card-body">
-                    <div className="driver-info">
-                      <div className="driver-avatar">
-                        <FaUser />
-                      </div>
-                      <div className="driver-details">
-                        <div className="info-item">
-                          <label>Trucker Name</label>
-                          <value>{booking.Trucker.name}</value>
-                        </div>
-                        <div className="info-item">
-                          <label>Contact Number</label>
-                          <value>
-                            <a href={`tel:${booking.Trucker.phone}`} className="phone-link">
-                              <FaPhone /> {booking.Trucker.phone}
-                            </a>
-                          </value>
-                        </div>
-                        <div className="info-item">
-                          <label>Email</label>
-                          <value>{booking.Trucker.email}</value>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )} */}
-
               {/* Booking Timeline */}
               <div className="detail-card">
                 <div className="card-header">
@@ -460,23 +672,16 @@ const numberToWords = (num) => {
                   <div className="info-grid">
                     <div className="info-item">
                       <label>Booking Created</label>
-                      <value>{new Date(booking.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}</value>
+                      <value>{formatDateTime(booking.createdAt)}</value>
                     </div>
                     <div className="info-item">
+                      <label>Delivery Date</label>
+                      <value>{formatDeliveryDate(booking.deliveryDate)}</value>
+
+                      </div>
+                    <div className="info-item">
                       <label>Last Updated</label>
-                      <value>{new Date(booking.updatedAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}</value>
+                      <value>{formatDateTime(booking.updatedAt)}</value>
                     </div>
                   </div>
                 </div>
@@ -630,12 +835,6 @@ const numberToWords = (num) => {
                 </button>
               </>
             )}
-            
-            {/* {booking.Trucker && ['accepted', 'picked_up', 'in_transit'].includes(booking.status.toLowerCase()) && (
-              <button className="btn btn-accent">
-                <FaPhone /> Call Trucker
-              </button>
-            )} */}
 
             {['picked_up', 'in_transit'].includes(booking.status.toLowerCase()) && (
               <button 
@@ -645,19 +844,17 @@ const numberToWords = (num) => {
                 <FaCar /> See Driver Location
               </button>
             )}
+
+            {/* {canPrintInvoice && (
+              <button
+                className="btn btn-secondary"
+                onClick={handlePrintInvoice}
+                disabled={invoiceGenerating}
+              >
+                <FaPrint /> {invoiceGenerating ? 'Preparing Invoice...' : 'Print Invoice'}
+              </button>
+            )} */}
             
-            {/* for clearance button */}
-            {/* <button 
-              className="btn btn-primary"
-            onClick={() => setIsModalOpen(true)}
-            >
-              <FaPlus />Add Clearance Doc
-            </button> */}
-            {/* Modal Component */}
-            {/* <Modal 
-              isOpen={isModalOpen} 
-              onClose={() => setIsModalOpen(false)} 
-            /> */}
             <button 
               className="btn btn-primary"
               onClick={() => navigate('/book-truck')}
@@ -770,78 +967,108 @@ const numberToWords = (num) => {
 
           {/* Confirm Order Modal */}
           {showConfirmModal && (
-            <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
-              <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
-                <div className="modal-header">
-                  <h3><FaClipboardCheck /> Confirm Your Order</h3>
-                  <button className="modal-close" onClick={() => setShowConfirmModal(false)}>
+            <div className="confirm-modal-overlay" onClick={() => setShowConfirmModal(false)}>
+              <div className="confirm-modal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="confirm-modal-header">
+                  <h3 style={{color:'white'}}>
+                    <FaClipboardCheck /> Confirm Your Order
+                  </h3>
+                  <button 
+                    style={{color:'black'}}
+                    className="confirm-modal-close"
+                    onClick={() => {
+                      setShowConfirmModal(false);
+                      setAgreedToTerms(false);
+                    }}
+                  >
                     <FaTimes />
                   </button>
                 </div>
 
-                <div className="modal-body">
-                  <div style={{ backgroundColor: '#f3f4f6', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
-                    <h4 style={{ color: '#000', marginBottom: '15px' }}>Order Summary</h4>
+                <div className="confirm-modal-body">
+                  <div className="order-summary-section">
+                    <h4>Order Summary</h4>
                     
-                    <div style={{ marginBottom: '10px' }}>
-                      <strong style={{ color: '#000' }}>Pickup:</strong>
-                      <p style={{ color: '#374151', margin: '5px 0' }}>{booking.pickupLocation}</p>
+                    <div className="summary-grid">
+                      <div className="summary-item">
+                        <strong>Pickup Location:</strong>
+                        <div className="summary-value">{booking.pickupLocation}</div>
+                      </div>
+
+                      <div className="summary-item">
+                        <strong>Drop Off Location:</strong>
+                        <div className="summary-value">{booking.dropLocation}</div>
+                      </div>
+
+                      <div className="summary-item">
+                        <strong>Vehicle Type:</strong>
+                        <div className="summary-value">{humanize(booking.vehicleType)}</div>
+                      </div>
+                      
+                      <div className="summary-item">
+                        <strong>Cargo Type:</strong>
+                        <div className="summary-value">{humanize(booking.cargoType)}</div>
+                      </div>
                     </div>
 
-                    <div style={{ marginBottom: '10px' }}>
-                      <strong style={{ color: '#000' }}>Drop Off:</strong>
-                      <p style={{ color: '#374151', margin: '5px 0' }}>{booking.dropLocation}</p>
-                    </div>
+                    {booking.cargoWeight && (
+                      <div className="summary-full-item">
+                        <strong>Cargo Weight:</strong>
+                        <div className="summary-value">
+                          <FaWeight /> {booking.cargoWeight} kg
+                        </div>
+                      </div>
+                    )}
 
-                    <div style={{ marginBottom: '10px' }}>
-                      <strong style={{ color: '#000' }}>Vehicle Type:</strong>
-                      <p style={{ color: '#374151', margin: '5px 0' }}>{booking.vehicleType}</p>
-                    </div>
-
-                    <div style={{ marginBottom: '10px' }}>
-                      <strong style={{ color: '#000' }}>Cargo Type:</strong>
-                      <p style={{ color: '#374151', margin: '5px 0' }}>{booking.cargoType}</p>
-                    </div>
-
-                    <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '2px solid #d1d5db' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <strong style={{ color: '#000', fontSize: '18px' }}>Total Budget:</strong>
-                        <strong style={{ color: '#01304e', fontSize: '22px' }}>
+                    <div className="budget-section">
+                      <div className="budget-header">
+                        <strong>Total Budget:</strong>
+                        <strong className="budget-amount">
                           PKR {booking.totalAmount 
                             ? parseFloat(booking.totalAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                             : parseFloat(booking.budget).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                           }
                         </strong>
                       </div>
-                      <p style={{ color: '#6b7280', fontSize: '14px', marginTop: '5px' }}>
+                      <p className="budget-words">
                         {numberToWords(booking.totalAmount ? parseFloat(booking.totalAmount) : parseFloat(booking.budget))}
                       </p>
                     </div>
                   </div>
 
-                  <div style={{ backgroundColor: '#fef3c7', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
-                    <p style={{ color: '#92400e', margin: 0, fontSize: '14px', lineHeight: '1.6' }}>
-                      <strong>Important:</strong> By confirming this order, you agree that the above details and budget are correct. 
-                      Once confirmed, a driver will be assigned to your shipment and you will be notified shortly.
-                    </p>
-                  </div>
+                  <div className="notices-section">
+                    <div className="important-notice">
+                      <h5>Important Notice</h5>
+                      <p>
+                        By confirming this order, you agree that the above details and budget are correct. 
+                        Once confirmed, a driver will be assigned to your shipment and you will be notified shortly.
+                      </p>
+                    </div>
 
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '20px' }}>
-                    <input
-                      type="checkbox"
-                      id="agreeTerms"
-                      checked={agreedToTerms}
-                      onChange={(e) => setAgreedToTerms(e.target.checked)}
-                      style={{ marginTop: '3px', cursor: 'pointer', width: '18px', height: '18px' }}
-                    />
-                    <label htmlFor="agreeTerms" style={{ color: '#000', fontSize: '14px', cursor: 'pointer', lineHeight: '1.5' }}>
-                      I confirm that all the details are correct and I agree to the terms and conditions. 
-                      I understand that once confirmed, the order cannot be cancelled without charges.
-                    </label>
+                   {/* Replace this part in BookingDetailScreen JSX */}
+<div className="terms-agreement">
+  <h5>Terms & Conditions</h5>
+
+  {/* New markup: input inside label for easier styling & accessibility */}
+  <label className="terms-checkbox custom" htmlFor="agreeTerms">
+    <input
+      id="agreeTerms"
+      type="checkbox"
+      checked={agreedToTerms}
+      onChange={(e) => setAgreedToTerms(e.target.checked)}
+    />
+    <span className="custom-box" aria-hidden="true"></span>
+    <span className="terms-text">
+      I confirm that all the details are correct and I agree to the terms and conditions.
+      I understand that once confirmed, the order cannot be cancelled without charges.
+    </span>
+  </label>
+</div>
+
                   </div>
                 </div>
 
-                <div className="modal-footer">
+                <div className="confirm-modal-footer">
                   <button 
                     className="btn btn-secondary" 
                     onClick={() => {
@@ -853,15 +1080,18 @@ const numberToWords = (num) => {
                     Cancel
                   </button>
                   <button 
-                    className="btn btn-primary"
+                    className="btn btn-primary confirm-order-btn"
                     onClick={handleConfirmOrder}
                     disabled={!agreedToTerms || confirmLoading}
-                    style={{ 
-                      opacity: (!agreedToTerms || confirmLoading) ? 0.6 : 1,
-                      cursor: (!agreedToTerms || confirmLoading) ? 'not-allowed' : 'pointer'
-                    }}
                   >
-                    {confirmLoading ? 'Confirming...' : 'Confirm Order'}
+                    {confirmLoading ? (
+                      <span className="confirm-loading">
+                        <div className="loading-spinner-small"></div>
+                        Confirming...
+                      </span>
+                    ) : (
+                      'Confirm Order'
+                    )}
                   </button>
                 </div>
               </div>
