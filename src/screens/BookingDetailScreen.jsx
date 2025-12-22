@@ -1025,13 +1025,13 @@ function BookingDetailScreen() {
                         <strong>Total Budget:</strong>
                         <strong className="budget-amount">
                           PKR {booking.totalAmount 
-                            ? parseFloat(booking.totalAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                            ? (parseFloat(booking.budget) - parseFloat(booking.totalAmount)).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                             : parseFloat(booking.budget).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                           }
                         </strong>
                       </div>
                       <p className="budget-words">
-                        {numberToWords(booking.totalAmount ? parseFloat(booking.totalAmount) : parseFloat(booking.budget))}
+                        {numberToWords(booking.totalAmount ? parseFloat(booking.budget) - parseFloat(booking.totalAmount) : parseFloat(booking.budget))}
                       </p>
                     </div>
                   </div>
