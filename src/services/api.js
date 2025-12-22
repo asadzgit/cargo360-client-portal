@@ -1,7 +1,13 @@
 import axios from 'axios';
 
-// Hardcoded API base URL - change this manually for development/production
-const API_BASE_URL = 'http://localhost:4000/';
+// Resolve API base URL with priority:
+// 1) VITE_API_BASE_URL from .env.local (for local development)
+// 2) window.APP_CONFIG.API_BASE_URL from public/config.js (for production builds)
+// 3) Fallback to localhost for local development
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (window.APP_CONFIG?.API_BASE_URL) ||
+  'http://localhost:4000/';
 
 // Create axios instance
 const apiClient = axios.create({
