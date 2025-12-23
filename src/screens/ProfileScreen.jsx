@@ -20,6 +20,7 @@ function ProfileScreen() {
   const [editName, setEditName] = useState('');
   const [editCompany, setEditCompany] = useState('');
   const [editPhone, setEditPhone] = useState('');
+  const [editCompany, setEditCompany] = useState('');
   const [updateLoading, setUpdateLoading] = useState(false);
   const [updateError, setUpdateError] = useState('');
   const [updateSuccess, setUpdateSuccess] = useState('');
@@ -43,6 +44,7 @@ function ProfileScreen() {
         setEditName(u?.name || '');
         setEditCompany(u?.company || '');
         setEditPhone(u?.phone || '');
+        setEditCompany(u?.company || '');
       } catch (e) {
         setFetchError(e?.message || 'Failed to load profile');
       } finally {
@@ -59,6 +61,7 @@ function ProfileScreen() {
     setEditName(profile?.name || '');
     setEditCompany(profile?.company || '');
     setEditPhone(profile?.phone || '');
+    setEditCompany(profile?.company || '');
   };
 
   const cancelEdit = () => {
@@ -66,6 +69,7 @@ function ProfileScreen() {
     setEditName(profile?.name || '');
     setEditCompany(profile?.company || '');
     setEditPhone(profile?.phone || '');
+    setEditCompany(profile?.company || '');
     setUpdateError('');
     setUpdateSuccess('');
   };
@@ -77,6 +81,7 @@ function ProfileScreen() {
     if (editName !== profile?.name) payload.name = editName.trim();
     if (editCompany !== profile?.company) payload.company = editCompany.trim();
     if (editPhone !== profile?.phone) payload.phone = editPhone.trim();
+    if (editCompany !== profile?.company) payload.company = editCompany.trim();
     if (Object.keys(payload).length === 0) {
       setUpdateError('No changes to update.');
       return;
@@ -96,6 +101,13 @@ function ProfileScreen() {
       setUpdateLoading(false);
     }
   };
+
+  // Auto-hide success message after a short delay
+  useEffect(() => {
+    if (!updateSuccess) return;
+    const timer = setTimeout(() => setUpdateSuccess(''), 3000);
+    return () => clearTimeout(timer);
+  }, [updateSuccess]);
 
   const submitPassword = async () => {
     setPwdError('');
@@ -189,19 +201,18 @@ function ProfileScreen() {
 
              {/* ✅ ADDED — SHOW COMPANY UNDER EMAIL */}
             <div className="info-item">
-  <label>Company</label>
-  {!isEditing ? (
-    <value>{profile.company || '-'}</value>
-  ) : (
-    <input
-      className="form-input"
-      value={editCompany}
-      onChange={(e) => setEditCompany(e.target.value)}
-      placeholder="Your company"
-    />
-  )}
-</div>
-
+              <label>Company</label>
+              {!isEditing ? (
+                <value>{profile.company || '-'}</value>
+              ) : (
+                <input
+                  className="form-input"
+                  value={editCompany}
+                  onChange={(e) => setEditCompany(e.target.value)}
+                  placeholder="Company name"
+                />
+              )}
+            </div>
 
             <div className="info-item">
                 <label>Phone</label>
