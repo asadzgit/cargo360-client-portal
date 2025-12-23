@@ -18,6 +18,7 @@ function ProfileScreen() {
   // Edit profile form
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
+  const [editCompany, setEditCompany] = useState('');
   const [editPhone, setEditPhone] = useState('');
   const [editCompany, setEditCompany] = useState('');
   const [updateLoading, setUpdateLoading] = useState(false);
@@ -41,6 +42,7 @@ function ProfileScreen() {
         const u = data?.user ?? data;
         setProfile(u);
         setEditName(u?.name || '');
+        setEditCompany(u?.company || '');
         setEditPhone(u?.phone || '');
         setEditCompany(u?.company || '');
       } catch (e) {
@@ -57,6 +59,7 @@ function ProfileScreen() {
     setUpdateSuccess('');
     setIsEditing(true);
     setEditName(profile?.name || '');
+    setEditCompany(profile?.company || '');
     setEditPhone(profile?.phone || '');
     setEditCompany(profile?.company || '');
   };
@@ -64,6 +67,7 @@ function ProfileScreen() {
   const cancelEdit = () => {
     setIsEditing(false);
     setEditName(profile?.name || '');
+    setEditCompany(profile?.company || '');
     setEditPhone(profile?.phone || '');
     setEditCompany(profile?.company || '');
     setUpdateError('');
@@ -75,6 +79,7 @@ function ProfileScreen() {
     setUpdateSuccess('');
     const payload = {};
     if (editName !== profile?.name) payload.name = editName.trim();
+    if (editCompany !== profile?.company) payload.company = editCompany.trim();
     if (editPhone !== profile?.phone) payload.phone = editPhone.trim();
     if (editCompany !== profile?.company) payload.company = editCompany.trim();
     if (Object.keys(payload).length === 0) {

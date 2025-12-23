@@ -25,7 +25,9 @@ function LoginScreen() {
     }
 
     try {
-      await login(email, password);
+      // Convert email to lowercase for case-insensitive login
+      const normalizedEmail = email.toLowerCase().trim();
+      await login(normalizedEmail, password);
       navigate('/client-home');
     } catch (err) {
       setError(err.message);
