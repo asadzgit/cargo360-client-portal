@@ -177,6 +177,7 @@ export const bookingAPI = {
         insurance: bookingData.insurance,
         salesTax: bookingData.salesTax,
         clearingAgentNum: bookingData.clearingAgentNum,
+        companyName: bookingData.companyName,
         bookingDate: bookingData.bookingDate,
         deliveryDate: bookingData.deliveryDate,
       },
