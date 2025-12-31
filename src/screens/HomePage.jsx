@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaTruck, FaGlobe, FaFileAlt, FaPaperPlane, FaAddressBook, FaEnvelope } from 'react-icons/fa';
 import { FaBuilding, FaBoxes, FaPhone, FaMapMarkerAlt, FaClock, FaShieldAlt, FaMoneyBill } from 'react-icons/fa';
-import {  FaUserTie, FaHome } from 'react-icons/fa';
+import {  FaUserTie, FaHome, FaWhatsapp } from 'react-icons/fa';
 
 import logo from '../assets/cargo-360.png';
 import { Link } from 'react-router-dom';
@@ -138,6 +138,17 @@ function HomePage() {
       <footer className="container screen-footer" style={{ textAlign: 'center', marginTop: 40 }}>
         <small>© {new Date().getFullYear()} CARGO 360. All rights reserved.</small>
       </footer>
+      
+      {/* WhatsApp Floating Button */}
+      <a
+        href="https://wa.me/923337766609"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="whatsapp-float"
+        aria-label="Contact us on WhatsApp"
+      >
+        <FaWhatsapp />
+      </a>
     </div>
     </> 
   );

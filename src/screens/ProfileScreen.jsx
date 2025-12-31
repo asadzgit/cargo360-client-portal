@@ -20,7 +20,6 @@ function ProfileScreen() {
   const [editName, setEditName] = useState('');
   const [editCompany, setEditCompany] = useState('');
   const [editPhone, setEditPhone] = useState('');
-  const [editCompany, setEditCompany] = useState('');
   const [updateLoading, setUpdateLoading] = useState(false);
   const [updateError, setUpdateError] = useState('');
   const [updateSuccess, setUpdateSuccess] = useState('');
