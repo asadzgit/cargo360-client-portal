@@ -21,19 +21,12 @@ function TabNavigation() {
     { path: '/profile', icon: FaIdBadge, label: 'Profile' },
   ];
 
-  const defaultTabs = [
-    { path: '/home', icon: FaHome, label: 'Home' },
-    { path: '/client-home', icon: FaUser, label: 'Client Area Login' },
-  ];
-
-  const selectedTabs = user ? tabs : defaultTabs;
-
   return (
     <>
       {user ? (
         <nav className="tab-navigation">
           <div className="tab-container">
-            {selectedTabs.map((tab) => (
+            {tabs.map((tab) => (
               <NavLink
                 key={tab.path}
                 to={tab.path}

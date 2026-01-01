@@ -7,7 +7,6 @@ import SignupScreen from './screens/SignupScreen';
 import ConfirmAccountScreen from './screens/ConfirmAccountScreen';
 import ResetPasswordScreen from './screens/ResetPasswordScreen';
 import HomeScreen from './screens/HomeScreen';
-import HomePage from './screens/HomePage';
 import BookTruckScreen from './screens/BookTruckScreen';
 import BookingStatusScreen from './screens/BookingStatusScreen';
 import BookingDetailScreen from './screens/BookingDetailScreen';
@@ -19,7 +18,6 @@ import VerificationFailure from './screens/VerificationFailure';
 import PrivacyPolicy from './screens/PrivacyPolicy';
 import ProfileScreen from './screens/ProfileScreen';
 import AccountDeletionScreen from './screens/AccountDeletionScreen';
-import PublicAccountDeletionScreen from './screens/PublicAccountDeletionScreen';
 
 import './App.css';
 
@@ -39,16 +37,7 @@ function AppContent() {
   return (
     <div className="app">
       <Routes>
-        <Route path="/" element={<Navigate to={user ? "/client-home" : "/home"} />} />
-         <Route 
-          path="/home" 
-          element={
-              <div className="main-content">
-                {/* <TabNavigation /> */}
-                <HomePage />
-              </div>
-          } 
-        />
+        <Route path="/" element={<Navigate to={user ? "/client-home" : "/login"} />} />
         <Route 
           path="/login" 
           element={
@@ -67,11 +56,7 @@ function AppContent() {
         />
         <Route
           path="/privacy-policy"
-          element={
-            <PublicRoute>
-              <PrivacyPolicy />
-            </PublicRoute>
-          }
+          element={<PrivacyPolicy />}
         />
         <Route
           path="/verification-success"
@@ -191,15 +176,6 @@ function AppContent() {
                 <TabNavigation />
               </div>
             </ProtectedRoute>
-          } 
-        />
-      
-      <Route 
-          path="/delete-mobile-account" 
-          element={
-            <div className="main-content">
-              <PublicAccountDeletionScreen />
-            </div>
           } 
         />
         </Routes>
