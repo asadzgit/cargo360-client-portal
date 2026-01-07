@@ -31,9 +31,10 @@ const LocationSelectNative = ({
           const { PlaceAutocompleteElement } = await window.google.maps.importLibrary("places");
           
           // Create the new PlaceAutocompleteElement
+          // Removed types restriction to get all results (addresses, businesses, establishments, etc.)
           const autocompleteElement = new PlaceAutocompleteElement({
-            componentRestrictions: { country: ['pk'] }, // Restrict results to Pakistan only
-            types: ['geocode'], // Only return geocoded locations
+            // componentRestrictions: { country: ['pk'] }, // Uncomment to restrict to Pakistan only
+            // types: ['geocode'], // Removed to get more comprehensive results
           });
 
           // Set placeholder

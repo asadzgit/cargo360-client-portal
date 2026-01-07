@@ -69,10 +69,13 @@ const LocationSelect = ({
       if (autocompleteServiceRef.current) {
         try {
           // Using Google Maps Places Autocomplete Service (no CORS issues)
+          // Removed types restriction to get all results (addresses, businesses, establishments, etc.)
           autocompleteServiceRef.current.getPlacePredictions(
             {
               input: inputValue,
-              types: ['geocode']
+              // types: ['geocode'], // Removed to get more comprehensive results
+              // Optionally restrict to specific countries if needed:
+              // componentRestrictions: { country: ['pk'] }, // Uncomment to restrict to Pakistan only
             },
             (predictions, status) => {
               console.log('Google Maps response:', { status, predictions });

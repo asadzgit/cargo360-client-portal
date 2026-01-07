@@ -18,6 +18,7 @@ import VerificationFailure from './screens/VerificationFailure';
 import PrivacyPolicy from './screens/PrivacyPolicy';
 import ProfileScreen from './screens/ProfileScreen';
 import AccountDeletionScreen from './screens/AccountDeletionScreen';
+import MapTestScreen from './screens/MapTestScreen';
 
 import './App.css';
 
@@ -57,6 +58,10 @@ function AppContent() {
         <Route
           path="/privacy-policy"
           element={<PrivacyPolicy />}
+        />
+        <Route
+          path="/test-map"
+          element={<MapTestScreen />}
         />
         <Route
           path="/verification-success"
