@@ -13,6 +13,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useBooking } from "../context/BookingContext";
 import LocationSelect from "../components/LocationSelect";
+import LocationMapSelector from "../components/LocationMapSelector";
 import { ClientFooter } from "../components/ClientFooter";
 import "./BookTruckScreen.css";
 
@@ -40,6 +41,8 @@ function BookTruckScreen() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [mapSelectorOpen, setMapSelectorOpen] = useState({ pickup: false, drop: false });
+  const [mapSelectorType, setMapSelectorType] = useState('pickup');
 
   // --- DATE HANDLERS & VALIDATORS ---
 const [bookingDateDisplay, setBookingDateDisplay] = useState("");
@@ -432,6 +435,20 @@ const handleDeliveryDateChange = (e) => {
     }
   };
 
+  const handleOpenMapSelector = (type) => {
+    setMapSelectorType(type);
+    setMapSelectorOpen({ pickup: type === 'pickup', drop: type === 'drop' });
+  };
+
+  const handleCloseMapSelector = () => {
+    setMapSelectorOpen({ pickup: false, drop: false });
+  };
+
+  const handleMapLocationSelect = (locationData) => {
+    const fieldName = mapSelectorType === 'pickup' ? 'pickupLocation' : 'dropLocation';
+    handleLocationChange(locationData.address, fieldName);
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -810,24 +827,53 @@ const handleDeliveryDateChange = (e) => {
                   <FaMapMarkerAlt /> Location Details
                 </h3>
                 <div className="location-fields">
-                  <LocationSelect
-                    label="Pickup Location *"
-                    name="pickupLocation"
-                    value={formData.pickupLocation}
-                    onChange={handleLocationChange}
-                    placeholder="Search for pickup location..."
-                    error={errors.pickupLocation}
-                  />
+                  <div className="location-input-wrapper">
+                    <LocationSelect
+                      label="Pickup Location *"
+                      name="pickupLocation"
+                      value={formData.pickupLocation}
+                      onChange={handleLocationChange}
+                      placeholder="Search for pickup location..."
+                      error={errors.pickupLocation}
+                    />
+                    <button
+                      type="button"
+                      className="map-selector-button"
+                      onClick={() => handleOpenMapSelector('pickup')}
+                      title="Select pickup location on map"
+                    >
+                      <FaMapMarkerAlt /> Select on Map
+                    </button>
+                  </div>
 
-                  <LocationSelect
-                    label="Drop Off Location *"
-                    name="dropLocation"
-                    value={formData.dropLocation}
-                    onChange={handleLocationChange}
-                    placeholder="Search for delivery location..."
-                    error={errors.dropLocation}
-                  />
+                  <div className="location-input-wrapper">
+                    <LocationSelect
+                      label="Drop Off Location *"
+                      name="dropLocation"
+                      value={formData.dropLocation}
+                      onChange={handleLocationChange}
+                      placeholder="Search for delivery location..."
+                      error={errors.dropLocation}
+                    />
+                    <button
+                      type="button"
+                      className="map-selector-button"
+                      onClick={() => handleOpenMapSelector('drop')}
+                      title="Select drop-off location on map"
+                    >
+                      <FaMapMarkerAlt /> Select on Map
+                    </button>
+                  </div>
                 </div>
+
+                {/* Map Selector Component */}
+                <LocationMapSelector
+                  isOpen={mapSelectorOpen.pickup || mapSelectorOpen.drop}
+                  onClose={handleCloseMapSelector}
+                  onSelect={handleMapLocationSelect}
+                  locationType={mapSelectorType}
+                  currentAddress={mapSelectorType === 'pickup' ? formData.pickupLocation : formData.dropLocation}
+                />
               </div>
               {/* Date Information */}
               {/* <div className="form-section">
