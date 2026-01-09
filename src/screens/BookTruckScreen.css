@@ -409,3 +409,78 @@ textarea.form-input::-webkit-scrollbar {
     padding: 12px 16px;
   }
 }
+
+/* Vehicle Category Buttons */
+.vehicle-category-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.vehicle-category-btn {
+  padding: 12px 16px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.vehicle-category-btn:hover {
+  border-color: #3b82f6;
+  background: #f0f9ff;
+  color: #1e40af;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2);
+}
+
+.vehicle-category-btn:active {
+  transform: translateY(0);
+}
+
+.vehicle-category-btn-other {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.vehicle-category-btn-other:hover {
+  border-color: #9ca3af;
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.change-vehicle-btn {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.change-vehicle-btn:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+@media (max-width: 768px) {
+  .vehicle-category-buttons {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .vehicle-category-btn {
+    padding: 14px 12px;
+    font-size: 13px;
+  }
+}
