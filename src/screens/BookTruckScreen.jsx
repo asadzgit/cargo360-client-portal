@@ -14,6 +14,7 @@ import { useAuth } from "../context/AuthContext";
 import { useBooking } from "../context/BookingContext";
 import LocationSelect from "../components/LocationSelect";
 import LocationMapSelector from "../components/LocationMapSelector";
+import VehicleTypeSelector from "../components/VehicleTypeSelector";
 import { ClientFooter } from "../components/ClientFooter";
 import "./BookTruckScreen.css";
 
@@ -38,11 +39,14 @@ function BookTruckScreen() {
     bookingDate: new Date().toISOString().split("T")[0], // auto-set to today
     deliveryDate: "",
   });
+  const [selectedVehicleInfo, setSelectedVehicleInfo] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [mapSelectorOpen, setMapSelectorOpen] = useState({ pickup: false, drop: false });
   const [mapSelectorType, setMapSelectorType] = useState('pickup');
+  const [vehicleSelectorOpen, setVehicleSelectorOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   // --- DATE HANDLERS & VALIDATORS ---
 const [bookingDateDisplay, setBookingDateDisplay] = useState("");
@@ -449,6 +453,36 @@ const handleDeliveryDateChange = (e) => {
     handleLocationChange(locationData.address, fieldName);
   };
 
+  const handleOpenVehicleSelector = (category) => {
+    setSelectedCategory(category);
+    setVehicleSelectorOpen(true);
+  };
+
+  const handleCloseVehicleSelector = () => {
+    setVehicleSelectorOpen(false);
+    setSelectedCategory('');
+  };
+
+  const handleVehicleSelect = (vehicle) => {
+    // Use vehicle name as the vehicleType value
+    setFormData((prev) => ({
+      ...prev,
+      vehicleType: vehicle.name,
+      customVehicleType: "",
+    }));
+    
+    // Store full vehicle info for display
+    setSelectedVehicleInfo(vehicle);
+    
+    // Clear error when vehicle is selected
+    if (errors.vehicleType) {
+      setErrors((prev) => ({
+        ...prev,
+        vehicleType: "",
+      }));
+    }
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -582,9 +616,10 @@ const handleDeliveryDateChange = (e) => {
     }
   };
 
+  // Find vehicle by name (since we now store vehicle name in formData.vehicleType)
   const selectedVehicle = vehicleTypes.find(
-    (v) => v.id === formData.vehicleType
-  );
+    (v) => v.id === formData.vehicleType || v.name === formData.vehicleType
+  ) || (formData.vehicleType && formData.vehicleType !== "other" ? { name: formData.vehicleType } : null);
 
   if (showSuccess) {
     return (
@@ -604,7 +639,9 @@ const handleDeliveryDateChange = (e) => {
                 <strong>Booking ID:</strong> Will be provided via email
               </p>
               <p>
-                <strong>Vehicle:</strong> {selectedVehicle?.name}
+                <strong>Vehicle:</strong> {formData.vehicleType === "other" 
+                  ? formData.customVehicleType 
+                  : (selectedVehicle?.name || formData.vehicleType)}
               </p>
               <p>
                 <strong>Route:</strong> {formData.pickupLocation} →{" "}
@@ -650,25 +687,85 @@ const handleDeliveryDateChange = (e) => {
                 <h3>Vehicle Information</h3>
                 <div className="form-group">
                   <label className="form-label">Vehicle Type *</label>
-                  <select
-                    name="vehicleType"
-                    className={`form-select ${
-                      errors.vehicleType ? "error" : ""
-                    }`}
-                    value={formData.vehicleType}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select vehicle type</option>
-                    {vehicleTypes.map((vehicle) => (
-                      <option key={vehicle.id} value={vehicle.id}>
-                        {vehicle.name} - {vehicle.capacity}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="vehicle-category-buttons">
+                    <button
+                      type="button"
+                      className="vehicle-category-btn"
+                      onClick={() => handleOpenVehicleSelector('Suzuki')}
+                    >
+                      Suzuki
+                    </button>
+                    <button
+                      type="button"
+                      className="vehicle-category-btn"
+                      onClick={() => handleOpenVehicleSelector('Shehzore')}
+                    >
+                      Shehzore
+                    </button>
+                    <button
+                      type="button"
+                      className="vehicle-category-btn"
+                      onClick={() => handleOpenVehicleSelector('Mazda')}
+                    >
+                      Mazda
+                    </button>
+                    <button
+                      type="button"
+                      className="vehicle-category-btn"
+                      onClick={() => handleOpenVehicleSelector('Truck')}
+                    >
+                      Truck
+                    </button>
+                    <button
+                      type="button"
+                      className="vehicle-category-btn"
+                      onClick={() => handleOpenVehicleSelector('Trailer')}
+                    >
+                      Trailer
+                    </button>
+                    <button
+                      type="button"
+                      className="vehicle-category-btn vehicle-category-btn-other"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          vehicleType: "other",
+                        }));
+                        setSelectedVehicleInfo(null);
+                      }}
+                    >
+                      Other
+                    </button>
+                  </div>
                   {errors.vehicleType && (
                     <div className="form-error">{errors.vehicleType}</div>
                   )}
                 </div>
+
+                {/* Selected Vehicle Display */}
+                {formData.vehicleType && formData.vehicleType !== "other" && (
+                  <div className="vehicle-details">
+                    <h4>{formData.vehicleType}</h4>
+                    {selectedVehicleInfo?.capacity && (
+                      <p>
+                        <strong>Capacity:</strong> {selectedVehicleInfo.capacity}
+                      </p>
+                    )}
+                    <button
+                      type="button"
+                      className="change-vehicle-btn"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          vehicleType: "",
+                        }));
+                        setSelectedVehicleInfo(null);
+                      }}
+                    >
+                      Change Vehicle
+                    </button>
+                  </div>
+                )}
 
                 {/* Custom Vehicle Type Input - Show when "Other" is selected */}
                 {formData.vehicleType === "other" && (
@@ -694,14 +791,13 @@ const handleDeliveryDateChange = (e) => {
                   </div>
                 )}
 
-                {selectedVehicle && formData.vehicleType !== "other" && (
-                  <div className="vehicle-details">
-                    <h4>{selectedVehicle.name}</h4>
-                    <p>
-                      <strong>Capacity:</strong> {selectedVehicle.capacity}
-                    </p>
-                  </div>
-                )}
+                {/* Vehicle Type Selector Modal */}
+                <VehicleTypeSelector
+                  isOpen={vehicleSelectorOpen}
+                  onClose={handleCloseVehicleSelector}
+                  onSelect={handleVehicleSelect}
+                  category={selectedCategory}
+                />
               </div>
 
               {/* Cargo Information */}
