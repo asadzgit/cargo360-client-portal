@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaRoute,FaMapMarkerAlt,FaClipboardList, FaFilter, FaEye, FaTruck, FaArrowRight, FaClock, FaCheckCircle, FaSearch, FaTimes } from 'react-icons/fa';
+import { FaRoute,FaMapMarkerAlt,FaClipboardList, FaFilter, FaEye, FaTruck, FaArrowRight, FaClock, FaCheckCircle, FaSearch, FaTimes, FaWhatsapp } from 'react-icons/fa';
 import { useBooking } from '../context/BookingContext';
 import './BookingStatusScreen.css';
 import { ClientFooter } from '../components/ClientFooter';
@@ -528,6 +528,17 @@ const formatDate = (dateString) => {
           </div>
         </div>
       )}
+
+      {/* WhatsApp Floating Button */}
+      <a
+        href="https://wa.me/923337766609"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="whatsapp-float"
+        aria-label="Contact us on WhatsApp"
+      >
+        <FaWhatsapp />
+      </a>
     </>
   );
 }

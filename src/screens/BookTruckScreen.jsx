@@ -9,6 +9,7 @@ import {
   FaDollarSign,
   FaUser,
   FaClipboardList,
+  FaWhatsapp,
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { useBooking } from "../context/BookingContext";
@@ -1097,6 +1098,17 @@ const handleDeliveryDateChange = (e) => {
         </div>
       </div>
       <ClientFooter />
+      
+      {/* WhatsApp Floating Button */}
+      <a
+        href="https://wa.me/923337766609"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="whatsapp-float"
+        aria-label="Contact us on WhatsApp"
+      >
+        <FaWhatsapp />
+      </a>
     </>
   );
 }
