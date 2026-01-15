@@ -20,13 +20,13 @@ import {
   FaClock,
   FaMoneyBill,
   FaUserTie,
-  FaHome,
-  FaWhatsapp
+  FaHome
 } from 'react-icons/fa';
 import Modal from '../components/Modal'; //  import Modal
 import { useAuth } from '../context/AuthContext';
 import { useBooking } from '../context/BookingContext';
 import {ClientFooter} from '../components/ClientFooter';
+import WhatsAppButton from '../components/WhatsAppButton';
 import { humanize } from '../utils/helpers';
 import './HomeScreen.css';
 
@@ -198,15 +198,7 @@ function HomeScreen() {
       <ClientFooter />
       
       {/* WhatsApp Floating Button */}
-      <a
-        href="https://wa.me/923337766609"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="whatsapp-float"
-        aria-label="Contact us on WhatsApp"
-      >
-        <FaWhatsapp />
-      </a>
+      <WhatsAppButton />
     </div>
   );
 }

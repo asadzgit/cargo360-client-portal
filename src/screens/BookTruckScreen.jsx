@@ -9,7 +9,6 @@ import {
   FaDollarSign,
   FaUser,
   FaClipboardList,
-  FaWhatsapp,
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { useBooking } from "../context/BookingContext";
@@ -17,6 +16,7 @@ import LocationSelect from "../components/LocationSelect";
 import LocationMapSelector from "../components/LocationMapSelector";
 import VehicleTypeSelector from "../components/VehicleTypeSelector";
 import { ClientFooter } from "../components/ClientFooter";
+import WhatsAppButton from "../components/WhatsAppButton";
 import "./BookTruckScreen.css";
 
 function BookTruckScreen() {
@@ -1100,15 +1100,7 @@ const handleDeliveryDateChange = (e) => {
       <ClientFooter />
       
       {/* WhatsApp Floating Button */}
-      <a
-        href="https://wa.me/923337766609"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="whatsapp-float"
-        aria-label="Contact us on WhatsApp"
-      >
-        <FaWhatsapp />
-      </a>
+      <WhatsAppButton />
     </>
   );
 }
