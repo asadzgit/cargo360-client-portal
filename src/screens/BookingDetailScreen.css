@@ -1095,3 +1095,16 @@
     max-width: 95%;
   }
 }
+
+/* Invoice Modal Styles */
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-overlay:not(.active) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Invoice styles moved to src/components/InvoiceModal.css */
