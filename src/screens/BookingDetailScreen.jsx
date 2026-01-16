@@ -5,6 +5,7 @@ import { useBooking } from '../context/BookingContext';
 import { useAuth } from '../context/AuthContext';
 import LocationTrackingModal from '../components/LocationTrackingModal';
 import EditBookingModal from '../components/EditBookingModal';
+import InvoiceModal from '../components/InvoiceModal';
 import { humanize } from '../utils/helpers';
 import { bookingAPI } from '../services/api';
 import {ClientFooter} from '../components/ClientFooter';
@@ -31,7 +32,7 @@ function BookingDetailScreen() {
   const [selectedCancelReason, setSelectedCancelReason] = useState('');
   const [customCancelReason, setCustomCancelReason] = useState('');
   const [cancelling, setCancelling] = useState(false);
-  // const [invoiceGenerating, setInvoiceGenerating] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
   useEffect(() => {
     const loadBooking = async () => {
@@ -845,15 +846,14 @@ function BookingDetailScreen() {
               </button>
             )}
 
-            {/* {canPrintInvoice && (
+            {booking.status.toLowerCase() === 'confirmed' && booking.budget && (
               <button
                 className="btn btn-secondary"
-                onClick={handlePrintInvoice}
-                disabled={invoiceGenerating}
+                onClick={() => setShowInvoiceModal(true)}
               >
-                <FaPrint /> {invoiceGenerating ? 'Preparing Invoice...' : 'Print Invoice'}
+                <FaPrint /> Print Invoice
               </button>
-            )} */}
+            )}
             
             <button 
               className="btn btn-primary"
@@ -876,6 +876,14 @@ function BookingDetailScreen() {
             isOpen={showEditModal}
             onClose={() => setShowEditModal(false)}
             onSuccess={handleEditSuccess}
+          />
+
+          {/* Invoice Modal */}
+          <InvoiceModal
+            isOpen={showInvoiceModal}
+            onClose={() => setShowInvoiceModal(false)}
+            booking={booking}
+            user={user}
           />
 
           {/* Cancel Reason Modal */}
