@@ -16,6 +16,7 @@ import LocationSelect from "../components/LocationSelect";
 import LocationMapSelector from "../components/LocationMapSelector";
 import VehicleTypeSelector from "../components/VehicleTypeSelector";
 import { ClientFooter } from "../components/ClientFooter";
+import WhatsAppButton from "../components/WhatsAppButton";
 import "./BookTruckScreen.css";
 
 function BookTruckScreen() {
@@ -1097,6 +1098,9 @@ const handleDeliveryDateChange = (e) => {
         </div>
       </div>
       <ClientFooter />
+      
+      {/* WhatsApp Floating Button */}
+      <WhatsAppButton />
     </>
   );
 }

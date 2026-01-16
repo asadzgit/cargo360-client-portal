@@ -5,6 +5,7 @@ import { userAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { ClientFooter } from '../components/ClientFooter';
+import WhatsAppButton from '../components/WhatsAppButton';
 
 import './AuthScreen.css'; // reuse basic styles
 
@@ -330,6 +331,9 @@ function ProfileScreen() {
     </div>
 
     <ClientFooter/>
+
+    {/* WhatsApp Floating Button */}
+    <WhatsAppButton />
     </>
   );
 }

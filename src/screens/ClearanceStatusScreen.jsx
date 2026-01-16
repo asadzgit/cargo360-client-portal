@@ -4,6 +4,7 @@ import { FaFileAlt, FaFilter, FaEye, FaClock, FaCheckCircle, FaSearch, FaTimes, 
 import { clearanceAPI } from '../services/api';
 import './ClearanceStatusScreen.css';
 import { ClientFooter } from '../components/ClientFooter';
+import WhatsAppButton from '../components/WhatsAppButton';
 import { humanize } from '../utils/helpers';
 import Modal from '../components/Modal';
 
@@ -510,6 +511,9 @@ function ClearanceStatusScreen() {
           </div>
         </div>
       )}
+
+      {/* WhatsApp Floating Button */}
+      <WhatsAppButton />
     </>
   );
 }

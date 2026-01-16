@@ -4,6 +4,7 @@ import { FaRoute,FaMapMarkerAlt,FaClipboardList, FaFilter, FaEye, FaTruck, FaArr
 import { useBooking } from '../context/BookingContext';
 import './BookingStatusScreen.css';
 import { ClientFooter } from '../components/ClientFooter';
+import WhatsAppButton from '../components/WhatsAppButton';
 import { humanize } from '../utils/helpers';
 
 function BookingStatusScreen() {
@@ -528,6 +529,9 @@ const formatDate = (dateString) => {
           </div>
         </div>
       )}
+
+      {/* WhatsApp Floating Button */}
+      <WhatsAppButton />
     </>
   );
 }
