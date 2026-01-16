@@ -1,7 +1,13 @@
 import axios from 'axios';
 
-// Hardcoded API base URL - change this manually for development/production
-const API_BASE_URL = 'https://cargo360-api.onrender.com/';
+// Resolve API base URL with priority:
+// 1) VITE_API_BASE_URL from .env.local (for local development)
+// 2) window.APP_CONFIG.API_BASE_URL from public/config.js (for production builds)
+// 3) Fallback to localhost for local development
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (typeof window !== 'undefined' && window.APP_CONFIG?.API_BASE_URL) ||
+  'http://localhost:4000/';
 
 // Create axios instance
 const apiClient = axios.create({
@@ -177,6 +183,7 @@ export const bookingAPI = {
         insurance: bookingData.insurance,
         salesTax: bookingData.salesTax,
         clearingAgentNum: bookingData.clearingAgentNum,
+        platform: bookingData.platform, // 'web' or 'mobile'
         bookingDate: bookingData.bookingDate,
         deliveryDate: bookingData.deliveryDate,
       },

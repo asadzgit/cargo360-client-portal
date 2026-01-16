@@ -593,7 +593,7 @@ const handleDeliveryDateChange = (e) => {
           : undefined,
         insurance: formData.insurance || undefined,
         salesTax: formData.salesTax || undefined,
-
+        platform: "web", // Track that booking is from web portal
         bookingDate: formData.bookingDate,
         deliveryDate: formData.deliveryDate,
 
