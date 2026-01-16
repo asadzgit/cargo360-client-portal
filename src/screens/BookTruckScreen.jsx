@@ -26,6 +26,7 @@ function BookTruckScreen() {
     loading: bookingLoading,
     error: bookingError,
   } = useBooking();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     vehicleType: "",
     cargoType: "",
@@ -39,6 +40,7 @@ function BookTruckScreen() {
     numContainers: "",
     bookingDate: new Date().toISOString().split("T")[0], // auto-set to today
     deliveryDate: "",
+    companyName: "",
   });
   const [selectedVehicleInfo, setSelectedVehicleInfo] = useState(null);
   const [errors, setErrors] = useState({});
@@ -68,6 +70,13 @@ useEffect(() => {
   const iso = `${yyyy}-${mm}-${dd}`;
   setFormData((prev) => ({ ...prev, bookingDate: iso }));
 }, []);
+
+// Pre-fill company name from user profile
+useEffect(() => {
+  if (user?.company) {
+    setFormData((prev) => ({ ...prev, companyName: user.company }));
+  }
+}, [user]);
 
 
 // Format user input (DD/MM/YYYY) and limit to valid day/month
@@ -594,6 +603,8 @@ const handleDeliveryDateChange = (e) => {
         insurance: formData.insurance || undefined,
         salesTax: formData.salesTax || undefined,
         platform: "web", // Track that booking is from web portal
+        companyName: formData.companyName || undefined,
+
         bookingDate: formData.bookingDate,
         deliveryDate: formData.deliveryDate,
 
@@ -971,6 +982,29 @@ const handleDeliveryDateChange = (e) => {
                   locationType={mapSelectorType}
                   currentAddress={mapSelectorType === 'pickup' ? formData.pickupLocation : formData.dropLocation}
                 />
+              </div>
+
+              {/* Company Information */}
+              <div className="form-section">
+                <h3>
+                  <FaUser /> Company Information
+                </h3>
+                <div className="form-group">
+                  <label className="form-label">Company Name</label>
+                  <input
+                    type="text"
+                    name="companyName"
+                    className={`form-input ${
+                      errors.companyName ? "error" : ""
+                    }`}
+                    value={formData.companyName}
+                    onChange={handleChange}
+                    placeholder="Enter your company name"
+                  />
+                  {errors.companyName && (
+                    <div className="form-error">{errors.companyName}</div>
+                  )}
+                </div>
               </div>
               {/* Date Information */}
               {/* <div className="form-section">

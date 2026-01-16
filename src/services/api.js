@@ -184,6 +184,7 @@ export const bookingAPI = {
         salesTax: bookingData.salesTax,
         clearingAgentNum: bookingData.clearingAgentNum,
         platform: bookingData.platform, // 'web' or 'mobile'
+        companyName: bookingData.companyName,
         bookingDate: bookingData.bookingDate,
         deliveryDate: bookingData.deliveryDate,
       },
